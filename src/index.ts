@@ -1,94 +1,13 @@
 import {
   Plugin,
-  App,
   setIcon,
   MarkdownView,
-  CachedMetadata,
 } from "obsidian";
 import * as nunjucks from "nunjucks"
+import { ObsidianLoader } from "./ObsidianLoader";
+import { SectionExtension } from "./SectionExtension";
+import { findSectionsWithHeadings } from "./utils";
 
-class ObsidianLoader extends nunjucks.Loader {
-  app: App
-  async: true
-
-  constructor(app: App) {
-    super()
-    this.async = true
-    this.app = app
-  }
-
-  getSource(path: string, callback: nunjucks.Callback<Error, nunjucks.LoaderSource>) {
-    const file = this.app.vault.getFileByPath(path)
-
-    if (!file) {
-      if (!path.endsWith('.njk')) {
-        this.getSource(`${path}.njk`, callback)
-        return
-      }
-      const error = new Error("No such template")
-      callback(error, null)
-      return
-    }
-
-    this.app.vault.cachedRead(file)
-      .then((data) => {
-        callback(null, {
-          src: data,
-          path,
-          noCache: true
-        })
-      })
-      .catch((err) => callback(err, null))
-  }
-}
-
-class SectionExtension {
-  getSection: (heading: string, defaultContent?: string) => string
-  tags = ['section']
-
-  constructor(getSection: (heading: string, defaultContent?: string) => string) {
-    this.getSection = getSection
-  }
-
-  // nunjucks' parser API is undocumented so we don't get type info here
-  parse(parser: any, nodes: any) {
-    const tok = parser.nextToken();
-
-    const args = parser.parseSignature(null, true);
-    parser.advanceAfterBlockEnd(tok.value);
-
-    const body = parser.parseUntilBlocks('endsection');
-
-    parser.advanceAfterBlockEnd();
-
-    return new nodes.CallExtension(this, 'run', args, [body]);
-  }
-
-  run(_: any, heading: string, defaultContent: () => string) {
-    return new nunjucks.runtime.SafeString(this.getSection(heading, defaultContent().trim()))
-  }
-}
-
-function findSectionsWithHeadings(metadata: CachedMetadata, contents: string) {
-  const sectionsWithHeadings: Array<{ heading: string, contents: string }> = []
-
-  for (const section of (metadata.sections || [])) {
-    if (section.type !== "heading" && sectionsWithHeadings.length === 0) {
-      continue
-    }
-    if (section.type === "heading") {
-      const heading = contents.slice(section.position.start.offset, section.position.end.offset).replace(/^#+\s+/, "")
-      sectionsWithHeadings.push({ heading, contents: "" })
-      continue
-    }
-    const lastSection = sectionsWithHeadings.at(-1)!
-    const sectionContents = contents.slice(section.position.start.offset, section.position.end.offset)
-    lastSection.contents += `${lastSection.contents.length > 0 ? "\n\n" : ''}${sectionContents}`
-
-  }
-
-  return Object.fromEntries(sectionsWithHeadings.map((section) => [section.heading, section.contents]))
-}
 
 export default class BlueprintPlugin extends Plugin {
   async onload() {
