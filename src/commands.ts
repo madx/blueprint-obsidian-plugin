@@ -1,32 +1,21 @@
-import { App, MarkdownView, Notice } from "obsidian";
+import { App, MarkdownView, Notice, TFile } from "obsidian";
 import * as nunjucks from "nunjucks"
 
 import { SectionExtension } from "./SectionExtension";
 import { ObsidianLoader } from "./ObsidianLoader";
-import { findSectionsWithHeadings } from "./utils";
+import { ensure, EnsureError, findSectionsWithHeadings } from "./utils";
 
-class EnsureError extends Error { }
-
-function ensure<T>(value: T, message: string): NonNullable<T> {
-  if (!value) {
-    throw new EnsureError(message)
-  }
-  return value
-}
-
-async function executeCurrentFileBlueprint(app: App, checking: boolean) {
+async function executeFileBlueprint(app: App, file: TFile) {
   const obsidianLoader = new ObsidianLoader(app)
 
   try {
-    const view = ensure(app.workspace.getActiveViewOfType(MarkdownView), "Current file is not a note");
-    const file = ensure(view.file, "Current view has no attached file")
     const metadata = ensure(app.metadataCache.getFileCache(file), `No cached metadata for ${file.basename}`)
     const frontmatterPosition = ensure(metadata.frontmatterPosition, "File has no frontmatter")
     const propPath = ensure(metadata.frontmatterLinks?.find(link => link.key === "blueprint"), "File has no blueprint")
     const linkPath = ensure(app.metadataCache.getFirstLinkpathDest(propPath?.link, file.path), "Cannot find linked blueprint")
-    const blueprint = ensure(await app.vault.cachedRead(linkPath), "Can't read blueprint file")
+    const blueprint = await app.vault.cachedRead(linkPath)
+    const contents = await app.vault.read(file)
 
-    const { data: contents } = view
 
     const sections = findSectionsWithHeadings(metadata, contents)
 
@@ -67,4 +56,4 @@ async function executeCurrentFileBlueprint(app: App, checking: boolean) {
 
 }
 
-export { executeCurrentFileBlueprint }
+export { executeFileBlueprint }

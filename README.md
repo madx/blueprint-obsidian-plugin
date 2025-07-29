@@ -17,7 +17,7 @@ Currently, the easiest way to install Blueprint is through [BRAT][brat] or manua
 
 - Store your templates as `.njk` files in a folder in your Vault
 - Add a `blueprint` property to your note with a link to the desired Blueprint file
-- Run the `Blueprint: Execute current file's blueprint` command to apply your template
+- Run the `Blueprint: Execute current file's Blueprint` command to apply your template
 - You can use a special notation to have a block under a heading with default contents. 
   Subsequent applications of the blueprint will keep your modifications to this section
 
