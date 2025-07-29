@@ -1,12 +1,8 @@
 import {
   Plugin,
-  setIcon,
-  MarkdownView,
 } from "obsidian";
 import * as nunjucks from "nunjucks"
-import { ObsidianLoader } from "./ObsidianLoader";
-import { SectionExtension } from "./SectionExtension";
-import { currentFileHasBlueprint, findSectionsWithHeadings } from "./utils";
+import { currentFileHasBlueprint } from "./utils";
 import { executeCurrentFileBlueprint } from "./commands";
 
 
