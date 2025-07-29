@@ -1,4 +1,4 @@
-import * as nunjucks from "nunjucks"
+import * as nunjucks from 'nunjucks'
 
 /**
  * This file is poorly typed, mainly because nunjucks' parser API is also poorly typed
@@ -14,16 +14,16 @@ class SectionExtension {
 
   // nunjucks' parser API is undocumented so we don't get type info here
   parse(parser: any, nodes: any) {
-    const tok = parser.nextToken();
+    const tok = parser.nextToken()
 
-    const args = parser.parseSignature(null, true);
-    parser.advanceAfterBlockEnd(tok.value);
+    const args = parser.parseSignature(null, true)
+    parser.advanceAfterBlockEnd(tok.value)
 
-    const body = parser.parseUntilBlocks('endsection');
+    const body = parser.parseUntilBlocks('endsection')
 
-    parser.advanceAfterBlockEnd();
+    parser.advanceAfterBlockEnd()
 
-    return new nodes.CallExtension(this, 'run', args, [body]);
+    return new nodes.CallExtension(this, 'run', args, [body])
   }
 
   run(_: any, heading: string, defaultContent: () => string) {

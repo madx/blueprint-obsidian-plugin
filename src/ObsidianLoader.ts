@@ -1,5 +1,5 @@
-import { App } from "obsidian"
-import * as nunjucks from "nunjucks"
+import * as nunjucks from 'nunjucks'
+import { App } from 'obsidian'
 
 class ObsidianLoader extends nunjucks.Loader {
   app: App
@@ -19,17 +19,18 @@ class ObsidianLoader extends nunjucks.Loader {
         this.getSource(`${path}.njk`, callback)
         return
       }
-      const error = new Error("No such template")
+      const error = new Error('No such template')
       callback(error, null)
       return
     }
 
-    this.app.vault.cachedRead(file)
+    this.app.vault
+      .cachedRead(file)
       .then((data) => {
         callback(null, {
           src: data,
           path,
-          noCache: true
+          noCache: true,
         })
       })
       .catch((err) => callback(err, null))

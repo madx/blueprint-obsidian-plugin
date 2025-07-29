@@ -19,6 +19,8 @@
     "builtin-modules": "5.0.0",
     "esbuild": "0.25.8",
     "obsidian": "latest",
+    "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.2.0",
     "tslib": "2.8.1",
     "typescript": "5.8.3"
   },
