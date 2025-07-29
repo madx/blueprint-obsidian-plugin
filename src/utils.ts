@@ -1,4 +1,17 @@
-import { CachedMetadata } from "obsidian"
+import { App, CachedMetadata, MarkdownView } from "obsidian"
+
+function currentFileHasBlueprint(app: App) {
+  const view = app.workspace.getActiveViewOfType(MarkdownView);
+
+  if (!view || !view.file) {
+    return false
+  }
+
+  const metadata = app.metadataCache.getFileCache(view.file)
+  const propPath = metadata?.frontmatterLinks?.find(link => link.key === "blueprint")
+
+  return Boolean(propPath)
+}
 
 function findSectionsWithHeadings(metadata: CachedMetadata, contents: string) {
   const sectionsWithHeadings: Array<{ heading: string, contents: string }> = []
@@ -21,4 +34,4 @@ function findSectionsWithHeadings(metadata: CachedMetadata, contents: string) {
   return Object.fromEntries(sectionsWithHeadings.map((section) => [section.heading, section.contents]))
 }
 
-export { findSectionsWithHeadings }
+export { currentFileHasBlueprint, findSectionsWithHeadings }
