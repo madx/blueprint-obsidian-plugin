@@ -38,7 +38,7 @@ async function executeCurrentFileBlueprint(app: App, checking: boolean) {
 
     try {
       const renderedContent: string = await new Promise((resolve, reject) => {
-        const renderContext = { file, frontmatter, ...frontmatter, section: getSection }
+        const renderContext = { file, frontmatter, ...frontmatter }
         template.render(renderContext, (err: unknown, result: string) => {
           if (err) {
             return reject(err)
