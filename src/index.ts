@@ -1,5 +1,5 @@
 import * as nunjucks from 'nunjucks'
-import { Plugin, TFile, TFolder } from 'obsidian'
+import { Notice, Plugin, TFile, TFolder } from 'obsidian'
 import { executeFileBlueprint } from './commands'
 import { fileHasBlueprint, findInTree, getCurrentFile } from './utils'
 
@@ -16,7 +16,17 @@ export default class BlueprintPlugin extends Plugin {
               .setIcon('layout-dashboard')
               .onClick(async () => {
                 const files = findInTree(file, (leaf: TFile) => fileHasBlueprint(this.app, leaf))
-                console.log(files)
+
+                if (files.length === 0) {
+                  new Notice(`No files with Blueprints found in ${file.path}`)
+                  return
+                }
+
+                for (const file of files) {
+                  await executeFileBlueprint(this.app, file)
+                }
+
+                new Notice(`Applied Blueprints in ${files.length} files`)
               })
           })
         }
