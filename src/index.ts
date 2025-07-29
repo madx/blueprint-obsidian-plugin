@@ -83,11 +83,5 @@ export default class BlueprintPlugin extends Plugin {
         }
       }
     })
-
-    this.registerMarkdownCodeBlockProcessor('blueprint', (_, el) => {
-      const codeBlock = el.createEl('div', { cls: "blueprint-code-block" })
-      setIcon(codeBlock, 'layout-template')
-      codeBlock.createEl('span', { text: "Blueprint" })
-    })
   }
 }
