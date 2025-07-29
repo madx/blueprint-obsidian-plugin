@@ -16,7 +16,7 @@ export default class BlueprintPlugin extends Plugin {
 
     this.addCommand({
       id: "execute-current-file-blueprint",
-      name: "Execute blueprint in current file",
+      name: "Execute current file's blueprint",
       callback: async () => {
         const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 
