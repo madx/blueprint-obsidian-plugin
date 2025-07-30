@@ -32,10 +32,3 @@ This is the default content of this section.
 [obsidian]: https://obsidian.md/
 [nunjucks]: https://mozilla.github.io/nunjucks/
 [brat]: https://github.com/TfTHacker/obsidian42-brat
-
-## TODO
-
-- [ ] Improve section splitting to handle sub-headers
-- [ ] Add a way to retrieve everything that is before the first header
-- [ ] Check how to handle ATX headers
-- [ ] Add a helper to ease outputting media embeds
