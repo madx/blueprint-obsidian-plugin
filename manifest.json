@@ -1,7 +1,7 @@
 {
   "id": "blueprint",
   "name": "Blueprint",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "minAppVersion": "0.15.0",
   "description": "Build your notes using  templates",
   "author": "François Vaux (@koleir)",
