@@ -1,11 +1,11 @@
 {
-  "id": "blueprint",
-  "name": "Blueprint",
-  "version": "0.0.0",
-  "minAppVersion": "0.15.0",
-  "description": "Build your notes using  templates",
-  "author": "François Vaux (@koleir)",
-  "authorUrl": "https://github.com/madx",
-  "fundingUrl": "https://github.com/sponsors/madx",
-  "isDesktopOnly": false
+	"id": "blueprint",
+	"name": "Blueprint",
+	"version": "0.0.1",
+	"minAppVersion": "0.15.0",
+	"description": "Build your notes using  templates",
+	"author": "François Vaux (@koleir)",
+	"authorUrl": "https://github.com/madx",
+	"fundingUrl": "https://github.com/sponsors/madx",
+	"isDesktopOnly": false
 }
