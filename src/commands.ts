@@ -1,9 +1,15 @@
 import * as nunjucks from 'nunjucks'
-import { App, Notice, TFile } from 'obsidian'
+import { App, Notice, TFile, TFolder } from 'obsidian'
 
 import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
-import { ensure, EnsureError, findSectionsWithHeadings } from './utils'
+import {
+  ensure,
+  EnsureError,
+  fileHasBlueprint,
+  findInTree,
+  findSectionsWithHeadings,
+} from './utils'
 
 async function executeFileBlueprint(app: App, file: TFile) {
   const obsidianLoader = new ObsidianLoader(app)
@@ -63,4 +69,19 @@ async function executeFileBlueprint(app: App, file: TFile) {
   }
 }
 
-export { executeFileBlueprint }
+async function executeFolderBlueprints(app: App, root: TFolder) {
+  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(this.app, leaf))
+
+  if (files.length === 0) {
+    new Notice(`No files with Blueprints found in ${root.path}`)
+    return
+  }
+
+  for (const file of files) {
+    await executeFileBlueprint(this.app, file)
+  }
+
+  new Notice(`Applied Blueprints in ${files.length} files`)
+}
+
+export { executeFileBlueprint, executeFolderBlueprints }

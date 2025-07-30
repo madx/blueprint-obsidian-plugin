@@ -1,7 +1,7 @@
 import * as nunjucks from 'nunjucks'
-import { Notice, Plugin, TFile, TFolder } from 'obsidian'
-import { executeFileBlueprint } from './commands'
-import { fileHasBlueprint, findInTree, getCurrentFile } from './utils'
+import { Plugin, TFile, TFolder } from 'obsidian'
+import { executeFileBlueprint, executeFolderBlueprints } from './commands'
+import { fileHasBlueprint, getCurrentFile } from './utils'
 
 export default class BlueprintPlugin extends Plugin {
   async onload() {
@@ -14,20 +14,7 @@ export default class BlueprintPlugin extends Plugin {
             item
               .setTitle('Apply all Blueprints')
               .setIcon('layout-dashboard')
-              .onClick(async () => {
-                const files = findInTree(file, (leaf: TFile) => fileHasBlueprint(this.app, leaf))
-
-                if (files.length === 0) {
-                  new Notice(`No files with Blueprints found in ${file.path}`)
-                  return
-                }
-
-                for (const file of files) {
-                  await executeFileBlueprint(this.app, file)
-                }
-
-                new Notice(`Applied Blueprints in ${files.length} files`)
-              })
+              .onClick(async () => executeFolderBlueprints(this.app, file))
           })
         }
         if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
