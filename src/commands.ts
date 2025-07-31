@@ -3,13 +3,7 @@ import { App, Notice, TFile, TFolder } from 'obsidian'
 
 import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
-import {
-  ensure,
-  EnsureError,
-  fileHasBlueprint,
-  findInTree,
-  findSectionsWithHeadings,
-} from './utils'
+import { ensure, EnsureError, fileHasBlueprint, findInTree, groupSectionsByHeading } from './utils'
 
 async function executeFileBlueprint(app: App, file: TFile) {
   const obsidianLoader = new ObsidianLoader(app)
@@ -31,12 +25,12 @@ async function executeFileBlueprint(app: App, file: TFile) {
     const blueprint = await app.vault.cachedRead(linkPath)
     const contents = await app.vault.read(file)
 
-    const sections = findSectionsWithHeadings(metadata, contents)
+    const sectionsByHeading = groupSectionsByHeading(metadata, contents)
 
     const frontmatter = metadata?.frontmatter || {}
     const getSection = (sectionName: string, defaultContent = '') =>
-      sections[sectionName] || defaultContent
-    const env = new nunjucks.Environment(obsidianLoader, { autoescape: false })
+      sectionsByHeading[sectionName] || defaultContent
+    const env = new nunjucks.Environment(obsidianLoader, { autoescape: false, trimBlocks: true })
     env.addExtension('SectionExtension', new SectionExtension(getSection))
     const template = new nunjucks.Template(blueprint, env, file.path)
 
@@ -70,7 +64,7 @@ async function executeFileBlueprint(app: App, file: TFile) {
 }
 
 async function executeFolderBlueprints(app: App, root: TFolder) {
-  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(this.app, leaf))
+  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf))
 
   if (files.length === 0) {
     new Notice(`No files with Blueprints found in ${root.path}`)
@@ -78,7 +72,7 @@ async function executeFolderBlueprints(app: App, root: TFolder) {
   }
 
   for (const file of files) {
-    await executeFileBlueprint(this.app, file)
+    await executeFileBlueprint(app, file)
   }
 
   new Notice(`Applied Blueprints in ${files.length} files`)

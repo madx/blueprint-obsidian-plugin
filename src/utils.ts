@@ -1,4 +1,12 @@
-import { App, CachedMetadata, MarkdownView, TAbstractFile, TFile, TFolder } from 'obsidian'
+import {
+  App,
+  CachedMetadata,
+  MarkdownView,
+  SectionCache,
+  TAbstractFile,
+  TFile,
+  TFolder,
+} from 'obsidian'
 
 class EnsureError extends Error {}
 
@@ -43,31 +51,78 @@ function findInTree(root: TFolder, predicate: (leaf: TFile) => boolean): TFile[]
   })
 }
 
-function findSectionsWithHeadings(metadata: CachedMetadata, contents: string) {
-  const sectionsWithHeadings: Array<{ heading: string; contents: string }> = []
+type Section = {
+  level: number
+  heading: string
+  contents: string
+}
 
-  for (const section of metadata.sections || []) {
-    if (section.type !== 'heading' && sectionsWithHeadings.length === 0) {
+const TOP_SECTION_ID = '___TOP___' as const
+
+function groupSectionsByHeading(metadata: CachedMetadata, contents: string) {
+  const topSection: Section = { level: 0, heading: TOP_SECTION_ID, contents: '' }
+  const path: Section[] = []
+  const byHeading: Section[] = [topSection]
+  // We always have a frontmatter since this is required for the blueprint property
+  const frontmatterSection = metadata?.sections?.shift() as SectionCache
+  let previousSectionCache: SectionCache = frontmatterSection
+
+  for (const sectionCache of metadata.sections || []) {
+    if (sectionCache.type === 'heading') {
+      // We split a header on spaces, first element are the # signs, then a variable length space
+      // then the actual heading that we join back, keeping its original spacing
+      const markdown = contents.slice(
+        previousSectionCache.position.end.offset,
+        sectionCache.position.end.offset,
+      )
+      const [hashes, _, ...headingParts] = markdown.trim().split(/(\s+)/)
+      const level = hashes.length
+      const heading = headingParts.join('')
+
+      const newSection: Section = { level, heading, contents: '' }
+      const previousSection = path.at(-1)
+
+      byHeading.push(newSection)
+
+      if (!previousSection) {
+        path.push(newSection)
+      } else if (previousSection.level < newSection.level) {
+        for (const parentSection of path) {
+          parentSection.contents += markdown
+        }
+        path.push(newSection)
+      } else if (previousSection.level === newSection.level) {
+        path.pop()
+        for (const parentSection of path) {
+          parentSection.contents += markdown
+        }
+        path.push(newSection)
+      } else {
+        while (path.length && (path.pop()?.level || 0) > newSection.level) {}
+        path.push(newSection)
+      }
+
+      previousSectionCache = sectionCache
       continue
     }
-    if (section.type === 'heading') {
-      const heading = contents
-        .slice(section.position.start.offset, section.position.end.offset)
-        .replace(/^#+\s+/, '')
-      sectionsWithHeadings.push({ heading, contents: '' })
-      continue
-    }
-    const lastSection = sectionsWithHeadings.at(-1)!
+
     const sectionContents = contents.slice(
-      section.position.start.offset,
-      section.position.end.offset,
+      previousSectionCache.position.end.offset,
+      sectionCache.position.end.offset,
     )
-    lastSection.contents += `${lastSection.contents.length > 0 ? '\n\n' : ''}${sectionContents}`
+    if (path.length === 0) {
+      // If we have no previous headings, it means we are still in the top section
+      topSection.contents += sectionContents
+    } else {
+      for (const parentSection of path) {
+        const lastSection = byHeading.at(-1) as Section // We always have at least one section
+        parentSection.contents += sectionContents
+      }
+    }
+    previousSectionCache = sectionCache
   }
 
-  return Object.fromEntries(
-    sectionsWithHeadings.map((section) => [section.heading, section.contents]),
-  )
+  return Object.fromEntries(byHeading.map(({ heading, contents }) => [heading, contents.trim()]))
 }
 
 export {
@@ -76,6 +131,6 @@ export {
   EnsureError,
   fileHasBlueprint,
   findInTree,
-  findSectionsWithHeadings,
   getCurrentFile,
+  groupSectionsByHeading,
 }
