@@ -1,7 +1,7 @@
 # Blueprint Obsidian Plugin
 
 [Blueprint][blueprint] is a templating plugin for [Obsidian][obsidian].
-It lets you enforce per-note templates, with support for frontmatter properties interpolation, repeatable applications, and more!
+It lets you enforce per-note templates, with support for frontmatter properties interpolation, non-destructive successive applications, and more!
 Blueprint templates use the [Nunjucks][nunjucks] templating engine, with additional features.
 
 ## Install
@@ -10,8 +10,14 @@ Currently, the easiest way to install Blueprint is through [BRAT][brat] or manua
 
 ## Documentation
 
+- [Setting-up your notes](#setting-up-your-notes)
+- [Interpolation](#interpolation)
+- [Sections](#sections)
+
 > [!NOTE]
 > This documentation might be a bit basic, feel free to reach me on Obsidian's Discord server, I'm @koleir there.
+
+### Setting-up your notes
 
 Blueprints are template files that allow you to enforce the layout of a note while keeping the ability to edit the note itself for modifications.
 It relies on logical sections in your notes, separated by headings.
@@ -24,7 +30,57 @@ You can apply the Blueprint by executing the `Blueprint: Execute current file's 
 
 You can apply the referenced Blueprint for all files of a given folder by right-clicking on the folder in the File Explorer and choosing `Apply all Blueprints`.
 
-### Syntax
+### Interpolation
+
+Blueprint gives you access to your frontmatter properties as variables in the Nunjucks context. 
+They keep the same type (text, number, list) as in the frontmatter.
+
+You also have access to a `file` variable which is the underlying [file object](https://docs.obsidian.md/Reference/TypeScript+API/TFile), as well as a `frontmatter` variable which is your frontmatter again, as an object, and which can be used if you have spaces and special characters in your frontmatter property names.
+
+**_Example_**:
+
+Note:
+
+
+```markdown
+---
+count: 0
+picture: "[[picture.jpg]]"
+blueprint: "[[template.njk]]"
+property with spaces: "Please don't put spaces in your property names."
+---
+```
+
+Template:
+
+```jinja
+# {{file.basename}}
+
+Count is {{count}}
+
+Here's a fancy picture !{{picture}}
+
+{{frontmatter['property with spaces']}}
+
+```
+
+Output:
+
+```markdown
+---
+count: 0
+picture: "[[picture.jpg]]"
+blueprint: "[[template.njk]]"
+---
+
+Count is 0
+
+Here's a fancy picture ![[picture.jpg]]
+
+Please don't put spaces in your property names.
+```
+
+### Sections
 
 In your templates, you have access to a new Nunjucks block type called `section`. 
 It takes an heading name as it's first argument, and the contents of the block will be used as the default content when applying the Blueprint.
