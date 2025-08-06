@@ -1,4 +1,4 @@
-# Blueprint Obsidian Plugin
+# 📘 Blueprint Obsidian Plugin
 
 [Blueprint][blueprint] is a templating plugin for [Obsidian][obsidian].
 It lets you enforce per-note templates, with support for frontmatter properties interpolation, non-destructive successive applications, and more!
@@ -117,6 +117,10 @@ Then subsequent applications of the Blueprint will keep the text untouched.
 Blueprint also understands a special `__TOP__` section which includes everything before the first header.
 
 ## Changelog
+
+### 0.0.3 - 0.0.4
+
+- Improve documentation
 
 ### 0.0.2
 
