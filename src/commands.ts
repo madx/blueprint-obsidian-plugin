@@ -1,13 +1,9 @@
-import * as nunjucks from 'nunjucks'
 import { App, Notice, TFile, TFolder } from 'obsidian'
 
-import { ObsidianLoader } from './ObsidianLoader'
-import { SectionExtension } from './SectionExtension'
+import { createTemplate } from 'src/createTemplate'
 import { ensure, EnsureError, fileHasBlueprint, findInTree, groupSectionsByHeading } from './utils'
 
 async function executeFileBlueprint(app: App, file: TFile) {
-  const obsidianLoader = new ObsidianLoader(app)
-
   try {
     const metadata = ensure(
       app.metadataCache.getFileCache(file),
@@ -24,39 +20,31 @@ async function executeFileBlueprint(app: App, file: TFile) {
     )
     const blueprint = await app.vault.cachedRead(linkPath)
     const contents = await app.vault.read(file)
-
     const sectionsByHeading = groupSectionsByHeading(metadata, contents)
-
     const frontmatter = metadata?.frontmatter || {}
-    const getSection = (sectionName: string, defaultContent = '') =>
-      sectionsByHeading[sectionName] || defaultContent
-    const env = new nunjucks.Environment(obsidianLoader, { autoescape: false, trimBlocks: true })
-    env.addExtension('SectionExtension', new SectionExtension(getSection))
-    const template = new nunjucks.Template(blueprint, env, file.path)
+    const template = createTemplate({ app, blueprint, filePath: file.path, sectionsByHeading })
 
-    try {
-      const renderedContent: string = await new Promise((resolve, reject) => {
-        const renderContext = { file, frontmatter, ...frontmatter }
-        template.render(renderContext, (err: unknown, result: string) => {
-          if (err) {
-            return reject(err)
-          }
+    const renderedContent: string = await new Promise((resolve, reject) => {
+      const renderContext = { file, frontmatter, ...frontmatter }
+      template.render(renderContext, (err: unknown, result: string) => {
+        if (err) {
+          return reject(err)
+        }
 
-          return resolve(result)
-        })
+        return resolve(result)
       })
+    })
 
-      app.vault.process(file, (contents) => {
-        const frontmatterRaw = contents.slice(0, (frontmatterPosition?.end.offset || 0) + 1)
+    app.vault.process(file, (contents) => {
+      const frontmatterRaw = contents.slice(0, (frontmatterPosition?.end.offset || 0) + 1)
 
-        return [frontmatterRaw, renderedContent].join('')
-      })
-    } catch (error) {
-      console.error(error)
-    }
+      return [frontmatterRaw, renderedContent].join('')
+    })
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
+    } else if (error.name.startsWith('Template render error')) {
+      new Notice(`${error.name}\n${error.message}`)
     } else {
       console.error(error)
     }
