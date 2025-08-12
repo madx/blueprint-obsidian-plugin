@@ -116,22 +116,67 @@ Then subsequent applications of the Blueprint will keep the text untouched.
 
 Blueprint also understands a special `__TOP__` section which includes everything before the first header.
 
+### Custom filters
+
+Blueprint adds a few custom filters to Nunjucks in order to make templating easier in the context of Obsidian
+
+#### `to_embed`
+
+Transforms a link to an embed, useful for having a link to an image in the frontmatter, but the actual embedded image in the note.
+`to_embed` accepts an optional parameter that is used as the display text.
+I the case of images, it allows settings their size as per [Obsidian's documentation](https://help.obsidian.md/embeds#Embed+an+image+in+a+note).
+
+**Example:** Input frontmatter
+
+```markdown
+---
+picture_url: "[[my_picture.jpg]]"
+---
+```
+
+Template
+
+```jinja
+{{ picture_url | to_embed("150") }}
+```
+
+Output Markdown
+
+```markdown
+![[my_picture.jpg|150]]
+```
+
+#### `split`
+
+Splits a string of characters along a given separator.
+Basically the opposite of [`join`](https://mozilla.github.io/nunjucks/templating.html#join).
+
+```jinja
+{{ "a,b,c" | split(",") | join(":") }}
+// Outputs a:b:c
+```
+
 ## Changelog
+
+### 0.0.5
+
+- Add `to_embed` and `split` filters.
+- Show error popups on template errors.
 
 ### 0.0.3 - 0.0.4
 
-- Improve documentation
+- Improve documentation.
 
 ### 0.0.2
 
-- Improve section handling by keeping content from sub-sections
+- Improve section handling by keeping content from sub-sections.
 - Add a special `__TOP__` section to include everything found before the first heading.
 
 ### 0.0.1
 
-- Proper release for BRAT
-- Allow applying Blueprints to all files in a folder
-- Code cleanup after initial proof-of-concept
+- Proper release for BRAT.
+- Allow applying Blueprints to all files in a folder.
+- Code cleanup after initial proof-of-concept.
 
 [blueprint]: https://github.com/madx/blueprint-obsidian-plugin
 [obsidian]: https://obsidian.md/

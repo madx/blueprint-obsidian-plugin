@@ -18,6 +18,14 @@ function createTemplate({ app, blueprint, filePath, sectionsByHeading }: CreateT
     sectionsByHeading[sectionName] || defaultContent
   env.addExtension('SectionExtension', new SectionExtension(getSection))
 
+  env.addFilter('to_embed', (link: string, display?: string) => {
+    return display ? `!${link.replace(/\]\]$/, `|${display}]]`)}` : `!${link}`
+  })
+
+  env.addFilter('split', (string: string, separator: string) => {
+    return string.split(separator)
+  })
+
   return new nunjucks.Template(blueprint, env, filePath)
 }
 
