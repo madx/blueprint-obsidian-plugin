@@ -34,16 +34,14 @@ export default class BlueprintPlugin extends Plugin {
       checkCallback: (checking: boolean) => {
         const file = this.app.workspace.getActiveFile()
 
-        if (checking) {
-          return file ? fileHasBlueprint(this.app, file) : false
+        if (file && fileHasBlueprint(this.app, file)) {
+          if (!checking) {
+            executeFileBlueprint(this.app, file)
+          }
+          return true
         }
 
-        if (!file) {
-          return false
-        }
-
-        executeFileBlueprint(this.app, file)
-        return true
+        return false
       },
     })
   }
