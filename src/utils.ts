@@ -1,12 +1,4 @@
-import {
-  App,
-  CachedMetadata,
-  MarkdownView,
-  SectionCache,
-  TAbstractFile,
-  TFile,
-  TFolder,
-} from 'obsidian'
+import { App, CachedMetadata, SectionCache, TAbstractFile, TFile, TFolder } from 'obsidian'
 
 class EnsureError extends Error {}
 
@@ -15,22 +7,6 @@ function ensure<T>(value: T, message: string): NonNullable<T> {
     throw new EnsureError(message)
   }
   return value
-}
-
-function getCurrentFile(app: App) {
-  const view = app.workspace.getActiveViewOfType(MarkdownView)
-
-  return view?.file ?? null
-}
-
-function currentFileHasBlueprint(app: App) {
-  const view = app.workspace.getActiveViewOfType(MarkdownView)
-
-  if (!view || !view.file) {
-    return false
-  }
-
-  return fileHasBlueprint(app, view.file)
 }
 
 function fileHasBlueprint(app: App, file: TFile) {
@@ -125,12 +101,4 @@ function groupSectionsByHeading(metadata: CachedMetadata, contents: string) {
   return Object.fromEntries(byHeading.map(({ heading, contents }) => [heading, contents.trim()]))
 }
 
-export {
-  currentFileHasBlueprint,
-  ensure,
-  EnsureError,
-  fileHasBlueprint,
-  findInTree,
-  getCurrentFile,
-  groupSectionsByHeading,
-}
+export { ensure, EnsureError, fileHasBlueprint, findInTree, groupSectionsByHeading }

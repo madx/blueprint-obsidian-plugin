@@ -1,7 +1,7 @@
 import * as nunjucks from 'nunjucks'
 import { Plugin, TFile, TFolder } from 'obsidian'
 import { executeFileBlueprint, executeFolderBlueprints } from './commands'
-import { fileHasBlueprint, getCurrentFile } from './utils'
+import { fileHasBlueprint } from './utils'
 
 export default class BlueprintPlugin extends Plugin {
   async onload() {
@@ -32,7 +32,7 @@ export default class BlueprintPlugin extends Plugin {
       id: 'execute-current-file-blueprint',
       name: "Execute current file's Blueprint",
       checkCallback: (checking: boolean) => {
-        const file = getCurrentFile(this.app)
+        const file = this.app.workspace.getActiveFile()
 
         if (checking) {
           return file ? fileHasBlueprint(this.app, file) : false
