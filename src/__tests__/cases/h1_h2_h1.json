@@ -1,0 +1,137 @@
+{
+  "headings": [
+    {
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 39
+        },
+        "end": {
+          "line": 3,
+          "col": 6,
+          "offset": 45
+        }
+      },
+      "heading": "H1_1",
+      "level": 1
+    },
+    {
+      "position": {
+        "start": {
+          "line": 4,
+          "col": 0,
+          "offset": 46
+        },
+        "end": {
+          "line": 4,
+          "col": 5,
+          "offset": 51
+        }
+      },
+      "heading": "H2",
+      "level": 2
+    },
+    {
+      "position": {
+        "start": {
+          "line": 5,
+          "col": 0,
+          "offset": 52
+        },
+        "end": {
+          "line": 5,
+          "col": 6,
+          "offset": 58
+        }
+      },
+      "heading": "H1_2",
+      "level": 1
+    }
+  ],
+  "sections": [
+    {
+      "type": "yaml",
+      "position": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "col": 3,
+          "offset": 38
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 39
+        },
+        "end": {
+          "line": 3,
+          "col": 6,
+          "offset": 45
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 4,
+          "col": 0,
+          "offset": 46
+        },
+        "end": {
+          "line": 4,
+          "col": 5,
+          "offset": 51
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 5,
+          "col": 0,
+          "offset": 52
+        },
+        "end": {
+          "line": 5,
+          "col": 6,
+          "offset": 58
+        }
+      }
+    }
+  ],
+  "frontmatter": {
+    "blueprint": "[[Blueprint.njk]]"
+  },
+  "frontmatterPosition": {
+    "start": {
+      "line": 0,
+      "col": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 2,
+      "col": 3,
+      "offset": 38
+    }
+  },
+  "frontmatterLinks": [
+    {
+      "key": "blueprint",
+      "link": "Blueprint.njk",
+      "original": "[[Blueprint.njk]]",
+      "displayText": "Blueprint.njk"
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 import { App, Notice, TFile, TFolder } from 'obsidian'
 
 import { createTemplate } from 'src/createTemplate'
-import { ensure, EnsureError, fileHasBlueprint, findInTree, groupSectionsByHeading } from './utils'
+import { parseSections } from 'src/parseSections'
+import { ensure, EnsureError, fileHasBlueprint, findInTree } from './utils'
 
 async function executeFileBlueprint(app: App, file: TFile) {
   try {
@@ -20,7 +21,9 @@ async function executeFileBlueprint(app: App, file: TFile) {
     )
     const blueprint = await app.vault.cachedRead(linkPath)
     const contents = await app.vault.read(file)
-    const sectionsByHeading = groupSectionsByHeading(metadata, contents)
+    // TODO: Remove
+    const sectionsByHeading = parseSections(metadata, contents)
+    console.log({ metadata, contents, sectionsByHeading })
     const frontmatter = metadata?.frontmatter || {}
     const template = createTemplate({ app, blueprint, filePath: file.path, sectionsByHeading })
 

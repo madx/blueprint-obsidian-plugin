@@ -44,5 +44,24 @@ export default class BlueprintPlugin extends Plugin {
         return false
       },
     })
+
+    this.addCommand({
+      id: 'dump-cached-metadata',
+      name: "Dump current file's CachedMetadata",
+      callback: async () => {
+        const file = this.app.workspace.getActiveFile()
+
+        if (file) {
+          const cachedMetadata = this.app.metadataCache.getFileCache(file)
+          const dumpFileName = `${file.path.replace(/\.md$/, '.json')}`
+          try {
+            await this.app.vault.create(dumpFileName, JSON.stringify(cachedMetadata, null, 2))
+          } catch (error: unknown) {
+            const dumpFile = this.app.vault.getFileByPath(dumpFileName)!
+            await this.app.vault.modify(dumpFile, JSON.stringify(cachedMetadata, null, 2))
+          }
+        }
+      },
+    })
   }
 }

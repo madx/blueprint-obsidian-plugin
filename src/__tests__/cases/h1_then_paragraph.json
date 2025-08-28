@@ -1,0 +1,91 @@
+{
+  "headings": [
+    {
+      "heading": "H1",
+      "level": 1,
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 39
+        },
+        "end": {
+          "line": 3,
+          "col": 4,
+          "offset": 43
+        }
+      }
+    }
+  ],
+  "sections": [
+    {
+      "type": "yaml",
+      "position": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "col": 3,
+          "offset": 38
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 39
+        },
+        "end": {
+          "line": 3,
+          "col": 4,
+          "offset": 43
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "position": {
+        "start": {
+          "line": 4,
+          "col": 0,
+          "offset": 44
+        },
+        "end": {
+          "line": 4,
+          "col": 9,
+          "offset": 53
+        }
+      }
+    }
+  ],
+  "frontmatter": {
+    "blueprint": "[[Blueprint.njk]]"
+  },
+  "frontmatterLinks": [
+    {
+      "key": "blueprint",
+      "link": "Blueprint.njk",
+      "original": "[[Blueprint.njk]]",
+      "displayText": "Blueprint.njk"
+    }
+  ],
+  "v": 1,
+  "frontmatterPosition": {
+    "start": {
+      "line": 0,
+      "col": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 2,
+      "col": 3,
+      "offset": 38
+    }
+  }
+}

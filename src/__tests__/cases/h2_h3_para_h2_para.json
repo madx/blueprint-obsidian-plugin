@@ -1,0 +1,168 @@
+{
+  "headings": [
+    {
+      "heading": "H2_1",
+      "level": 2,
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 39
+        },
+        "end": {
+          "line": 3,
+          "col": 7,
+          "offset": 46
+        }
+      }
+    },
+    {
+      "heading": "H3",
+      "level": 3,
+      "position": {
+        "start": {
+          "line": 4,
+          "col": 0,
+          "offset": 47
+        },
+        "end": {
+          "line": 4,
+          "col": 6,
+          "offset": 53
+        }
+      }
+    },
+    {
+      "heading": "H2_2",
+      "level": 2,
+      "position": {
+        "start": {
+          "line": 6,
+          "col": 0,
+          "offset": 66
+        },
+        "end": {
+          "line": 6,
+          "col": 7,
+          "offset": 73
+        }
+      }
+    }
+  ],
+  "sections": [
+    {
+      "type": "yaml",
+      "position": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "col": 3,
+          "offset": 38
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 39
+        },
+        "end": {
+          "line": 3,
+          "col": 7,
+          "offset": 46
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 4,
+          "col": 0,
+          "offset": 47
+        },
+        "end": {
+          "line": 4,
+          "col": 6,
+          "offset": 53
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "position": {
+        "start": {
+          "line": 5,
+          "col": 0,
+          "offset": 54
+        },
+        "end": {
+          "line": 5,
+          "col": 11,
+          "offset": 65
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "position": {
+        "start": {
+          "line": 6,
+          "col": 0,
+          "offset": 66
+        },
+        "end": {
+          "line": 6,
+          "col": 7,
+          "offset": 73
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "position": {
+        "start": {
+          "line": 7,
+          "col": 0,
+          "offset": 74
+        },
+        "end": {
+          "line": 7,
+          "col": 11,
+          "offset": 85
+        }
+      }
+    }
+  ],
+  "frontmatter": {
+    "blueprint": "[[Blueprint.njk]]"
+  },
+  "frontmatterLinks": [
+    {
+      "key": "blueprint",
+      "link": "Blueprint.njk",
+      "original": "[[Blueprint.njk]]",
+      "displayText": "Blueprint.njk"
+    }
+  ],
+  "v": 1,
+  "frontmatterPosition": {
+    "start": {
+      "line": 0,
+      "col": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 2,
+      "col": 3,
+      "offset": 38
+    }
+  }
+}
