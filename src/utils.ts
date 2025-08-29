@@ -40,10 +40,10 @@ function groupSectionsByHeading(metadata: CachedMetadata, contents: string) {
   const path: Section[] = []
   const byHeading: Section[] = [topSection]
   // We always have a frontmatter since this is required for the blueprint property
-  const frontmatterSection = metadata?.sections?.shift() as SectionCache
+  const [frontmatterSection, ...noteSections] = metadata.sections!
   let previousSectionCache: SectionCache = frontmatterSection
 
-  for (const sectionCache of metadata.sections || []) {
+  for (const sectionCache of noteSections) {
     if (sectionCache.type === 'heading') {
       // We split a header on spaces, first element are the # signs, then a variable length space
       // then the actual heading that we join back, keeping its original spacing

@@ -35,7 +35,7 @@ async function executeFileBlueprint(app: App, file: TFile) {
       })
     })
 
-    app.vault.process(file, (contents) => {
+    await app.vault.process(file, (contents) => {
       const frontmatterRaw = contents.slice(0, (frontmatterPosition?.end.offset || 0) + 1)
 
       return [frontmatterRaw, renderedContent].join('')
