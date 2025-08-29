@@ -80,7 +80,6 @@ function groupSectionsByHeading(metadata: CachedMetadata, contents: string) {
       path.push(newSection)
 
       previousSectionCache = sectionCache
-      console.log([...path])
       continue
     }
 
