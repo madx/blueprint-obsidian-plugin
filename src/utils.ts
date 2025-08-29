@@ -62,23 +62,25 @@ function groupSectionsByHeading(metadata: CachedMetadata, contents: string) {
 
       if (!previousSection) {
         path.push(newSection)
-      } else if (previousSection.level < newSection.level) {
-        for (const parentSection of path) {
-          parentSection.contents += markdown
-        }
-        path.push(newSection)
-      } else if (previousSection.level === newSection.level) {
-        path.pop()
-        for (const parentSection of path) {
-          parentSection.contents += markdown
-        }
-        path.push(newSection)
-      } else {
-        while (path.length && (path.pop()?.level || 0) > newSection.level) {}
-        path.push(newSection)
+        previousSectionCache = sectionCache
+        continue
       }
 
+      if (previousSection.level < newSection.level) {
+        while (path.length && (path.at(-1)?.level || 0) > newSection.level) {
+          path.pop()
+        }
+      } else if (previousSection.level === newSection.level) {
+        path.pop()
+      }
+
+      for (const parentSection of path) {
+        parentSection.contents += markdown
+      }
+      path.push(newSection)
+
       previousSectionCache = sectionCache
+      console.log([...path])
       continue
     }
 
