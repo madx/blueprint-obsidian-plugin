@@ -158,6 +158,10 @@ Basically the opposite of [`join`](https://mozilla.github.io/nunjucks/templating
 
 ## Changelog
 
+### 0.0.7
+
+- Add a bunch of tests to make sure regressions are catched earlier
+
 ### 0.0.6
 
 - Fix section processing that was making some sections disappear (issues #7 & #8)

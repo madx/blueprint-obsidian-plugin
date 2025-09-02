@@ -23,7 +23,6 @@ async function executeFileBlueprint(app: App, file: TFile) {
     const contents = await app.vault.read(file)
     // TODO: Remove
     const sectionsByHeading = parseSections(metadata, contents)
-    console.log({ metadata, contents, sectionsByHeading })
     const frontmatter = metadata?.frontmatter || {}
     const template = createTemplate({ app, blueprint, filePath: file.path, sectionsByHeading })
 
