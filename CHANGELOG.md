@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.1.2
+
+- Remove a debug command that shouldn't have been there 😅
+
 ### 0.1.1
 
 - Update plugin id and description
