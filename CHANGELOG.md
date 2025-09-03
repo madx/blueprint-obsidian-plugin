@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.1.1
+
+- Update plugin id and description
+
 ### 0.1.0
 
 - Split CHANGELOG from README

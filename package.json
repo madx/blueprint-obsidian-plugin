@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-sample-plugin",
+  "name": "blueprint-obsidian-plugin",
   "version": "0.1.0",
-  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "description": "Write once, update everywhere - note templates that pull from Properties",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
