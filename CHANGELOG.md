@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.1.3
+
+- Fix a requirement for the plugin review
+
 ### 0.1.2
 
 - Remove a debug command that shouldn't have been there 😅
