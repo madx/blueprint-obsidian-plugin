@@ -17,12 +17,11 @@ function fileHasBlueprint(app: App, file: TFile) {
 }
 
 function findInTree(root: TFolder, predicate: (leaf: TFile) => boolean): TFile[] {
-  return root.children.flatMap((leaf: TAbstractFile) => {
+  return root.children.flatMap((leaf: TFile | TFolder) => {
     if (isFolder(leaf)) {
       return findInTree(leaf, predicate)
     } else {
-      const file = leaf as TFile
-      return predicate(file) ? file : []
+      return predicate(leaf) ? leaf : []
     }
   })
 }
