@@ -1,4 +1,4 @@
-import { App, Notice, TFile, TFolder } from 'obsidian'
+import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFolder } from 'obsidian'
 
 import { createTemplate } from 'src/createTemplate'
 import { parseSections } from 'src/parseSections'
@@ -10,7 +10,6 @@ async function executeFileBlueprint(app: App, file: TFile) {
       app.metadataCache.getFileCache(file),
       `No cached metadata for ${file.basename}`,
     )
-    const frontmatterPosition = ensure(metadata.frontmatterPosition, 'File has no frontmatter')
     const propPath = ensure(
       metadata.frontmatterLinks?.find((link) => link.key === 'blueprint'),
       'File has no blueprint',
@@ -23,7 +22,15 @@ async function executeFileBlueprint(app: App, file: TFile) {
     const contents = await app.vault.read(file)
     // TODO: Remove
     const sectionsByHeading = parseSections(metadata, contents)
-    const frontmatter = metadata?.frontmatter || {}
+    const noteFrontmatter = metadata?.frontmatter || {}
+    const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
+    const blueprintFrontmatter =
+      parseYaml(blueprintFrontmatterInfo.frontmatter) ?? ({} as Record<string, unknown>)
+    const missingFrontmatterEntries = Object.fromEntries(
+      Object.entries(blueprintFrontmatter).filter(([key]) => !(key in noteFrontmatter)),
+    )
+    const frontmatter = Object.assign({}, noteFrontmatter, missingFrontmatterEntries)
+
     const template = createTemplate({ app, blueprint, filePath: file.path, sectionsByHeading })
 
     const renderedContent: string = await new Promise((resolve, reject) => {
@@ -37,11 +44,13 @@ async function executeFileBlueprint(app: App, file: TFile) {
       })
     })
 
-    await app.vault.process(file, (contents) => {
-      const frontmatterRaw = contents.slice(0, (frontmatterPosition?.end.offset || 0) + 1)
+    const outputContent = blueprintFrontmatterInfo.exists
+      ? renderedContent.slice(blueprintFrontmatterInfo.contentStart)
+      : renderedContent
 
-      return [frontmatterRaw, renderedContent].join('')
-    })
+    const outputNote = ['---', stringifyYaml(frontmatter).trim(), '---', outputContent].join('\n')
+
+    await app.vault.modify(file, outputNote)
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
