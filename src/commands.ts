@@ -77,4 +77,25 @@ async function executeFolderBlueprints(app: App, root: TFolder) {
   new Notice(`Applied Blueprints in ${files.length} files`)
 }
 
-export { executeFileBlueprint, executeFolderBlueprints }
+async function updateBlueprintNotes(app: App, file: TFile) {
+  const notesUsingBlueprint = Object.entries(app.metadataCache.resolvedLinks)
+    .filter(([_, links]) => file.path in links)
+    .map(([key]) => key)
+
+  if (notesUsingBlueprint.length === 0) {
+    new Notice(`No notes are using this Blueprint`)
+    return
+  }
+
+  for (const notePath of notesUsingBlueprint) {
+    const file = app.vault.getFileByPath(notePath)
+
+    if (file) {
+      await executeFileBlueprint(app, file)
+    }
+  }
+
+  new Notice(`Applied Blueprint in ${notesUsingBlueprint.length} notes`)
+}
+
+export { executeFileBlueprint, executeFolderBlueprints, updateBlueprintNotes }

@@ -1,7 +1,7 @@
 import * as nunjucks from 'nunjucks'
 import { Plugin, TFile, TFolder } from 'obsidian'
-import { executeFileBlueprint, executeFolderBlueprints } from './commands'
-import { fileHasBlueprint } from './utils'
+import { executeFileBlueprint, executeFolderBlueprints, updateBlueprintNotes } from './commands'
+import { fileHasBlueprint, fileIsBlueprint } from './utils'
 
 export default class BlueprintPlugin extends Plugin {
   async onload() {
@@ -25,6 +25,14 @@ export default class BlueprintPlugin extends Plugin {
               .onClick(async () => executeFileBlueprint(this.app, file))
           })
         }
+        if (file instanceof TFile && fileIsBlueprint(file)) {
+          menu.addItem((item) => {
+            item
+              .setTitle('Update notes using this Blueprint')
+              .setIcon('layout-dashboard')
+              .onClick(async () => updateBlueprintNotes(this.app, file))
+          })
+        }
       }),
     )
 
@@ -37,6 +45,23 @@ export default class BlueprintPlugin extends Plugin {
         if (file && fileHasBlueprint(this.app, file)) {
           if (!checking) {
             executeFileBlueprint(this.app, file)
+          }
+          return true
+        }
+
+        return false
+      },
+    })
+
+    this.addCommand({
+      id: 'update-notes-using-blueprint',
+      name: 'Update notes using this Blueprint',
+      checkCallback: (checking: boolean) => {
+        const file = this.app.workspace.getActiveFile()
+
+        if (file && fileIsBlueprint(file)) {
+          if (!checking) {
+            updateBlueprintNotes(this.app, file)
           }
           return true
         }
