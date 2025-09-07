@@ -15,8 +15,8 @@ class ObsidianLoader extends nunjucks.Loader {
     const file = this.app.vault.getFileByPath(path)
 
     if (!file) {
-      if (!path.endsWith('.njk')) {
-        this.getSource(`${path}.njk`, callback)
+      if (!path.endsWith('.blueprint')) {
+        this.getSource(`${path}.blueprint`, callback)
         return
       }
       const error = new Error('No such template')

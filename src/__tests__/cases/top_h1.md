@@ -1,5 +1,5 @@
 ---
-blueprint: "[[Blueprint.njk]]"
+blueprint: "[[Blueprint.blueprint]]"
 ---
 Paragraph
 

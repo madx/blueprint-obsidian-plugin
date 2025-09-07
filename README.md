@@ -24,7 +24,7 @@ It relies on logical sections in your notes, separated by headings.
 
 Blueprints are built on top of the [Nunjucks][nunjucks] template language, adding some special markup for handling the sections in your notes.
 
-To start using Blueprint, create a template with the `.njk` file extension in your Vault, and link it in your note's `blueprint` property.
+To start using Blueprint, create a template with the `.blueprint` file extension in your Vault, and link it in your note's `blueprint` property.
 
 You can apply the Blueprint by executing the `Blueprint: Execute current file's Blueprint` command, or by right clicking on it in the File Explorer then choosing `Apply Blueprint`.
 
@@ -46,7 +46,7 @@ Note:
 ---
 count: 0
 picture: "[[picture.jpg]]"
-blueprint: "[[template.njk]]"
+blueprint: "[[template.blueprint]]"
 property with spaces: "Please don't put spaces in your property names."
 ---
 ```
@@ -70,7 +70,7 @@ Output:
 ---
 count: 0
 picture: "[[picture.jpg]]"
-blueprint: "[[template.njk]]"
+blueprint: "[[template.blueprint]]"
 ---
 
 Count is 0

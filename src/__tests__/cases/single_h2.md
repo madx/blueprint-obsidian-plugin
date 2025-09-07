@@ -1,4 +1,4 @@
 ---
-blueprint: "[[Blueprint.njk]]"
+blueprint: "[[Blueprint.blueprint]]"
 ---
 ## H2

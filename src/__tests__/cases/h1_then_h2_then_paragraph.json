@@ -1,36 +1,36 @@
 {
   "headings": [
     {
+      "heading": "H1",
+      "level": 1,
       "position": {
         "start": {
           "line": 3,
           "col": 0,
-          "offset": 39
+          "offset": 45
         },
         "end": {
           "line": 3,
           "col": 4,
-          "offset": 43
+          "offset": 49
         }
-      },
-      "heading": "H1",
-      "level": 1
+      }
     },
     {
+      "heading": "H2",
+      "level": 2,
       "position": {
         "start": {
           "line": 4,
           "col": 0,
-          "offset": 44
+          "offset": 50
         },
         "end": {
           "line": 4,
           "col": 5,
-          "offset": 49
+          "offset": 55
         }
-      },
-      "heading": "H2",
-      "level": 2
+      }
     }
   ],
   "sections": [
@@ -45,7 +45,7 @@
         "end": {
           "line": 2,
           "col": 3,
-          "offset": 38
+          "offset": 44
         }
       }
     },
@@ -55,12 +55,12 @@
         "start": {
           "line": 3,
           "col": 0,
-          "offset": 39
+          "offset": 45
         },
         "end": {
           "line": 3,
           "col": 4,
-          "offset": 43
+          "offset": 49
         }
       }
     },
@@ -70,12 +70,12 @@
         "start": {
           "line": 4,
           "col": 0,
-          "offset": 44
+          "offset": 50
         },
         "end": {
           "line": 4,
           "col": 5,
-          "offset": 49
+          "offset": 55
         }
       }
     },
@@ -85,19 +85,28 @@
         "start": {
           "line": 5,
           "col": 0,
-          "offset": 50
+          "offset": 56
         },
         "end": {
           "line": 5,
           "col": 9,
-          "offset": 59
+          "offset": 65
         }
       }
     }
   ],
   "frontmatter": {
-    "blueprint": "[[Blueprint.njk]]"
+    "blueprint": "[[Blueprint.blueprint]]"
   },
+  "frontmatterLinks": [
+    {
+      "key": "blueprint",
+      "link": "Blueprint.blueprint",
+      "original": "[[Blueprint.blueprint]]",
+      "displayText": "Blueprint.blueprint"
+    }
+  ],
+  "v": 1,
   "frontmatterPosition": {
     "start": {
       "line": 0,
@@ -107,15 +116,7 @@
     "end": {
       "line": 2,
       "col": 3,
-      "offset": 38
+      "offset": 44
     }
-  },
-  "frontmatterLinks": [
-    {
-      "key": "blueprint",
-      "link": "Blueprint.njk",
-      "original": "[[Blueprint.njk]]",
-      "displayText": "Blueprint.njk"
-    }
-  ]
+  }
 }

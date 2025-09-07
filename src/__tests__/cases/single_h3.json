@@ -7,12 +7,12 @@
         "start": {
           "line": 3,
           "col": 0,
-          "offset": 39
+          "offset": 45
         },
         "end": {
           "line": 3,
           "col": 6,
-          "offset": 45
+          "offset": 51
         }
       }
     }
@@ -29,7 +29,7 @@
         "end": {
           "line": 2,
           "col": 3,
-          "offset": 38
+          "offset": 44
         }
       }
     },
@@ -39,25 +39,25 @@
         "start": {
           "line": 3,
           "col": 0,
-          "offset": 39
+          "offset": 45
         },
         "end": {
           "line": 3,
           "col": 6,
-          "offset": 45
+          "offset": 51
         }
       }
     }
   ],
   "frontmatter": {
-    "blueprint": "[[Blueprint.njk]]"
+    "blueprint": "[[Blueprint.blueprint]]"
   },
   "frontmatterLinks": [
     {
       "key": "blueprint",
-      "link": "Blueprint.njk",
-      "original": "[[Blueprint.njk]]",
-      "displayText": "Blueprint.njk"
+      "link": "Blueprint.blueprint",
+      "original": "[[Blueprint.blueprint]]",
+      "displayText": "Blueprint.blueprint"
     }
   ],
   "v": 1,
@@ -70,7 +70,7 @@
     "end": {
       "line": 2,
       "col": 3,
-      "offset": 38
+      "offset": 44
     }
   }
 }

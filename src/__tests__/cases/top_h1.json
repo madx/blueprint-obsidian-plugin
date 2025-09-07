@@ -1,20 +1,20 @@
 {
   "headings": [
     {
+      "heading": "H1",
+      "level": 1,
       "position": {
         "start": {
           "line": 8,
           "col": 0,
-          "offset": 79
+          "offset": 85
         },
         "end": {
           "line": 8,
           "col": 4,
-          "offset": 83
+          "offset": 89
         }
-      },
-      "heading": "H1",
-      "level": 1
+      }
     }
   ],
   "sections": [
@@ -29,7 +29,7 @@
         "end": {
           "line": 2,
           "col": 3,
-          "offset": 38
+          "offset": 44
         }
       }
     },
@@ -39,12 +39,12 @@
         "start": {
           "line": 3,
           "col": 0,
-          "offset": 39
+          "offset": 45
         },
         "end": {
           "line": 3,
           "col": 9,
-          "offset": 48
+          "offset": 54
         }
       }
     },
@@ -54,12 +54,12 @@
         "start": {
           "line": 5,
           "col": 0,
-          "offset": 50
+          "offset": 56
         },
         "end": {
           "line": 6,
           "col": 13,
-          "offset": 77
+          "offset": 83
         }
       }
     },
@@ -69,51 +69,60 @@
         "start": {
           "line": 8,
           "col": 0,
-          "offset": 79
+          "offset": 85
         },
         "end": {
           "line": 8,
           "col": 4,
-          "offset": 83
+          "offset": 89
         }
       }
     }
   ],
   "listItems": [
     {
+      "parent": -5,
       "position": {
         "start": {
           "line": 5,
           "col": 0,
-          "offset": 50
+          "offset": 56
         },
         "end": {
           "line": 5,
           "col": 13,
-          "offset": 63
+          "offset": 69
         }
-      },
-      "parent": -5
+      }
     },
     {
+      "parent": -5,
       "position": {
         "start": {
           "line": 6,
           "col": 0,
-          "offset": 64
+          "offset": 70
         },
         "end": {
           "line": 6,
           "col": 13,
-          "offset": 77
+          "offset": 83
         }
-      },
-      "parent": -5
+      }
     }
   ],
   "frontmatter": {
-    "blueprint": "[[Blueprint.njk]]"
+    "blueprint": "[[Blueprint.blueprint]]"
   },
+  "frontmatterLinks": [
+    {
+      "key": "blueprint",
+      "link": "Blueprint.blueprint",
+      "original": "[[Blueprint.blueprint]]",
+      "displayText": "Blueprint.blueprint"
+    }
+  ],
+  "v": 1,
   "frontmatterPosition": {
     "start": {
       "line": 0,
@@ -123,15 +132,7 @@
     "end": {
       "line": 2,
       "col": 3,
-      "offset": 38
+      "offset": 44
     }
-  },
-  "frontmatterLinks": [
-    {
-      "key": "blueprint",
-      "link": "Blueprint.njk",
-      "original": "[[Blueprint.njk]]",
-      "displayText": "Blueprint.njk"
-    }
-  ]
+  }
 }
