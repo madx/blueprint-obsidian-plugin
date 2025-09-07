@@ -26,16 +26,18 @@ Blueprints are built on top of the [Nunjucks][nunjucks] template language, addin
 
 To start using Blueprint, create a template with the `.blueprint` file extension in your Vault, and link it in your note's `blueprint` property.
 
-You can apply the Blueprint by executing the `Blueprint: Execute current file's Blueprint` command, or by right clicking on it in the File Explorer then choosing `Apply Blueprint`.
+You can apply the blueprint by executing the `Blueprint: Apply blueprint` command, or by right clicking on it in the File Explorer then choosing `Apply blueprint`.
 
-You can apply the referenced Blueprint for all files of a given folder by right-clicking on the folder in the File Explorer and choosing `Apply all Blueprints`.
+You can apply the referenced blueprint for all notes of a given folder by right-clicking on the folder in the File Explorer and choosing `Update all notes with blueprints`.
+
+Finally, you can also update all notes using a blueprint either by using the `Blueprint: Update notes using this blueprint` command, or by right clicking on the blueprint file in the explorer and select the `Update notes using this blueprint` option in the context menu.
 
 ### Interpolation
 
 Blueprint gives you access to your frontmatter properties as variables in the Nunjucks context. 
 They keep the same type (text, number, list) as in the frontmatter.
 
-You also have access to a `file` variable which is the underlying [file object](https://docs.obsidian.md/Reference/TypeScript+API/TFile), as well as a `frontmatter` variable which is your frontmatter again, as an object, and which can be used if you have spaces and special characters in your frontmatter property names.
+You also have access to a `file` variable which is the underlying [file object](https://docs.obsidian.md/Reference/TypeScript+API/TFile), as well as a `frontmatter` variable which is your frontmatter again, as an object. This can be used if you have spaces and special characters in your frontmatter property names.
 
 **_Example_**:
 
@@ -83,10 +85,10 @@ Please don't put spaces in your property names.
 ### Sections
 
 In your templates, you have access to a new Nunjucks block type called `section`. 
-It takes an heading name as it's first argument, and the contents of the block will be used as the default content when applying the Blueprint.
-If the notes you are applying a Blueprint to already has the target heading, it's content as well as all its sub-sections will be used instead of the default text.
+It takes an heading name as it's first argument, and the contents of the block will be used as the default content when applying the blueprint.
+If the notes you are applying a blueprint to already has the target heading, it's content as well as all its sub-sections will be used instead of the default text.
 
-**_Example_**: Let's say you have the following Blueprint:
+**_Example_**: Let's say you have the following blueprint:
 
 ```jinja2
 ## Heading
@@ -112,9 +114,42 @@ If you edit the note this way:
 This is the updated content of this section.
 ```
 
-Then subsequent applications of the Blueprint will keep the text untouched.
+Then subsequent applications of the blueprint will keep the text untouched.
 
 Blueprint also understands a special `__TOP__` section which includes everything before the first header.
+
+### Frontmatter
+
+Blueprint lets you specify a default frontmatter for a note. 
+It will only add missing properties from the frontmatter and will never remove properties that you defined yourself.
+
+Properties defined in the blueprint can be used in subsequent interpolations.
+
+```jinja
+---
+a_number: 21
+a_string: "Hello"
+---
+{{a_string}}, twice the number is {{a_number * 2}}
+```
+
+Note content before blueprint application:
+
+```markdown
+---
+a_string: "Hello, world!"
+---
+```
+
+Note content after applying the blueprint:
+
+```markdown
+---
+a_number: 21
+a_string: "Hello, world!"
+---
+Hello, world!, twice the number is 42
+```
 
 ### Custom filters
 

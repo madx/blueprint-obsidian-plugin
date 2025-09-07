@@ -12,7 +12,7 @@ export default class BlueprintPlugin extends Plugin {
         if (file instanceof TFolder) {
           menu.addItem((item) => {
             item
-              .setTitle('Apply all Blueprints')
+              .setTitle('Update all notes with blueprints')
               .setIcon('layout-dashboard')
               .onClick(async () => executeFolderBlueprints(this.app, file))
           })
@@ -20,7 +20,7 @@ export default class BlueprintPlugin extends Plugin {
         if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
           menu.addItem((item) => {
             item
-              .setTitle('Apply Blueprint')
+              .setTitle('Apply blueprint')
               .setIcon('layout-dashboard')
               .onClick(async () => executeFileBlueprint(this.app, file))
           })
@@ -28,7 +28,7 @@ export default class BlueprintPlugin extends Plugin {
         if (file instanceof TFile && fileIsBlueprint(file)) {
           menu.addItem((item) => {
             item
-              .setTitle('Update notes using this Blueprint')
+              .setTitle('Update notes using this blueprint')
               .setIcon('layout-dashboard')
               .onClick(async () => updateBlueprintNotes(this.app, file))
           })
@@ -37,8 +37,8 @@ export default class BlueprintPlugin extends Plugin {
     )
 
     this.addCommand({
-      id: 'execute-current-file-blueprint',
-      name: "Execute current file's Blueprint",
+      id: 'apply-blueprint',
+      name: 'Apply blueprint',
       checkCallback: (checking: boolean) => {
         const file = this.app.workspace.getActiveFile()
 
@@ -55,7 +55,7 @@ export default class BlueprintPlugin extends Plugin {
 
     this.addCommand({
       id: 'update-notes-using-blueprint',
-      name: 'Update notes using this Blueprint',
+      name: 'Update notes using this blueprint',
       checkCallback: (checking: boolean) => {
         const file = this.app.workspace.getActiveFile()
 

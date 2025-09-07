@@ -65,7 +65,7 @@ async function executeFolderBlueprints(app: App, root: TFolder) {
   const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf))
 
   if (files.length === 0) {
-    new Notice(`No files with Blueprints found in ${root.path}`)
+    new Notice(`No notes with blueprints found in ${root.path}`)
     return
   }
 
@@ -73,7 +73,7 @@ async function executeFolderBlueprints(app: App, root: TFolder) {
     await executeFileBlueprint(app, file)
   }
 
-  new Notice(`Applied Blueprints in ${files.length} files`)
+  new Notice(`Applied blueprints in ${files.length} notes`)
 }
 
 async function updateBlueprintNotes(app: App, file: TFile) {
@@ -82,7 +82,7 @@ async function updateBlueprintNotes(app: App, file: TFile) {
     .map(([key]) => key)
 
   if (notesUsingBlueprint.length === 0) {
-    new Notice(`No notes are using this Blueprint`)
+    new Notice(`No notes are using this blueprint`)
     return
   }
 
@@ -94,7 +94,7 @@ async function updateBlueprintNotes(app: App, file: TFile) {
     }
   }
 
-  new Notice(`Applied Blueprint in ${notesUsingBlueprint.length} notes`)
+  new Notice(`Applied blueprint in ${notesUsingBlueprint.length} notes`)
 }
 
 export { executeFileBlueprint, executeFolderBlueprints, updateBlueprintNotes }
