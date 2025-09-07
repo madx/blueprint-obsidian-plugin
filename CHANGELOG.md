@@ -1,5 +1,13 @@
 ## Changelog
 
+### 0.2.0
+
+- BREAKING CHANGE: Blueprint files should now use the `.blueprint` file extension.
+- Allow setting frontmatter properties using a blueprint
+- Allow updating all notes using a given blueprint
+- Add `moment` as a global variable available in blueprints
+- Update documentation and wordings
+
 ### 0.1.3
 
 - Fix a requirement for the plugin review
