@@ -1,6 +1,6 @@
 import * as nunjucks from 'nunjucks'
 
-import { App } from 'obsidian'
+import { App, moment } from 'obsidian'
 import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
 
@@ -17,6 +17,8 @@ function createTemplate({ app, blueprint, filePath, sectionsByHeading }: CreateT
   const getSection = (sectionName: string, defaultContent = '') =>
     sectionsByHeading[sectionName] || defaultContent
   env.addExtension('SectionExtension', new SectionExtension(getSection))
+
+  env.addGlobal('moment', moment)
 
   env.addFilter('to_embed', (link: string, display?: string) => {
     return display ? `!${link.replace(/\]\]$/, `|${display}]]`)}` : `!${link}`

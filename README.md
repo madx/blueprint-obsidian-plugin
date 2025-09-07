@@ -191,7 +191,17 @@ Basically the opposite of [`join`](https://mozilla.github.io/nunjucks/templating
 // Outputs a:b:c
 ```
 
+### moment
+
+Obsidian's default time manipulation library, [`moment`][moment] is exported as a global so you can use it in your blueprints.
+
+```jinja
+{% set relativeUpdatedAt= moment(updatedAt).fromNow() -%}
+This note was updated {{relativeUpdatedAt}}.
+```
+
 [blueprint]: https://github.com/madx/blueprint-obsidian-plugin
 [obsidian]: https://obsidian.md/
 [nunjucks]: https://mozilla.github.io/nunjucks/
 [brat]: https://github.com/TfTHacker/obsidian42-brat
+[moment]: https://momentjs.com
