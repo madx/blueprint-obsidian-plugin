@@ -20,7 +20,6 @@ async function executeFileBlueprint(app: App, file: TFile) {
     )
     const blueprint = await app.vault.cachedRead(linkPath)
     const contents = await app.vault.read(file)
-    // TODO: Remove
     const sectionsByHeading = parseSections(metadata, contents)
     const noteFrontmatter = metadata?.frontmatter || {}
     const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
