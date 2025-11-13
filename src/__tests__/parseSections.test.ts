@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises'
 import { CachedMetadata } from 'obsidian'
 import * as path from 'path'
-import { parseSections, TOP_SECTION_ID } from 'src/parseSections'
 import { assert, describe, test } from 'vitest'
+import { parseSections, TOP_SECTION_ID } from '../parseSections'
 
 type Case = { metadata: CachedMetadata; content: string }
 async function loadCase(name: string): Promise<Case> {
