@@ -1,6 +1,6 @@
 {
   "name": "blueprint-obsidian-plugin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Write once, update everywhere - note templates that pull from Properties.",
   "main": "main.js",
   "scripts": {
