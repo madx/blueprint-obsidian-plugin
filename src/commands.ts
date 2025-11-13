@@ -49,7 +49,7 @@ async function executeFileBlueprint(app: App, file: TFile) {
 
     const outputNote = ['---', stringifyYaml(frontmatter).trim(), '---', outputContent].join('\n')
 
-    await app.vault.modify(file, outputNote)
+    await app.vault.process(file, () => outputNote)
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
