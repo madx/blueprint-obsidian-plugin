@@ -2,7 +2,7 @@ import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFold
 
 import { createTemplate } from 'src/createTemplate'
 import { parseSections } from 'src/parseSections'
-import { ensure, EnsureError, fileHasBlueprint, findInTree } from './utils'
+import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
 
 async function executeFileBlueprint(app: App, file: TFile) {
   try {
@@ -10,54 +10,75 @@ async function executeFileBlueprint(app: App, file: TFile) {
       app.metadataCache.getFileCache(file),
       `No cached metadata for ${file.basename}`,
     )
-    const propPath = ensure(
+    const blueprintPropertyPath = ensure(
       metadata.frontmatterLinks?.find((link) => link.key === 'blueprint'),
       'File has no blueprint',
     )
-    const linkPath = ensure(
-      app.metadataCache.getFirstLinkpathDest(propPath?.link, file.path),
+    const blueprintFilePath = ensure(
+      app.metadataCache.getFirstLinkpathDest(blueprintPropertyPath?.link, file.path),
       'Cannot find linked blueprint',
     )
-    const blueprint = await app.vault.cachedRead(linkPath)
-    const contents = await app.vault.read(file)
-    const sectionsByHeading = parseSections(metadata, contents)
-    const noteFrontmatter = metadata?.frontmatter || {}
+
+    const blueprint = await app.vault.cachedRead(blueprintFilePath)
+    const fileContent = await app.vault.read(file)
+    const filePath = file.path
+    const sectionsByHeading = parseSections(metadata, fileContent)
+
+    // Render blueprint's frontmatter then merge it with the note's frontmatter
     const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
+    const noteFrontmatter = metadata?.frontmatter || {}
     const blueprintFrontmatter =
       parseYaml(blueprintFrontmatterInfo.frontmatter) ?? ({} as Record<string, unknown>)
-    const missingFrontmatterEntries = Object.fromEntries(
+    const missingFrontmatterEntriesBeforeRendering = Object.fromEntries(
       Object.entries(blueprintFrontmatter).filter(([key]) => !(key in noteFrontmatter)),
     )
-    const frontmatter = Object.assign({}, noteFrontmatter, missingFrontmatterEntries)
+    const mergedFrontmatter = Object.assign(
+      {},
+      noteFrontmatter,
+      missingFrontmatterEntriesBeforeRendering,
+    )
 
-    const template = createTemplate({ app, blueprint, filePath: file.path, sectionsByHeading })
-
-    const renderedContent: string = await new Promise((resolve, reject) => {
-      const renderContext = { file, frontmatter, ...frontmatter }
-      template.render(renderContext, (err: unknown, result: string) => {
-        if (err) {
-          return reject(err)
-        }
-
-        return resolve(result)
-      })
+    const frontmatterTemplate = createTemplate({
+      app,
+      filePath,
+      sectionsByHeading,
+      blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
     })
+    const frontmatterContext = { file, frontmatter: mergedFrontmatter, ...mergedFrontmatter }
+    const renderedBlueprintFrontmatter = await renderTemplate(
+      frontmatterTemplate,
+      frontmatterContext,
+    )
+    const parsedRenderedBlueprintFrontmatter =
+      parseYaml(renderedBlueprintFrontmatter) ?? ({} as Record<string, unknown>)
+    const missingFrontmatterEntriesAfterRendering = Object.fromEntries(
+      Object.entries(parsedRenderedBlueprintFrontmatter).filter(
+        ([key]) => !(key in noteFrontmatter),
+      ),
+    )
+    const frontmatter = Object.assign({}, noteFrontmatter, missingFrontmatterEntriesAfterRendering)
+    const renderedFrontmatter = stringifyYaml(frontmatter).trim()
 
-    const outputContent = blueprintFrontmatterInfo.exists
-      ? renderedContent.slice(blueprintFrontmatterInfo.contentStart)
-      : renderedContent
+    // Render the note's content
+    const contentTemplate = createTemplate({
+      app,
+      filePath,
+      sectionsByHeading,
+      blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
+    })
+    const contentContext = { file, frontmatter, ...frontmatter }
+    const renderedContent = await renderTemplate(contentTemplate, contentContext)
 
-    const outputNote = ['---', stringifyYaml(frontmatter).trim(), '---', outputContent].join('\n')
-
-    await app.vault.process(file, () => outputNote)
+    // Update note
+    const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
+    await app.vault.process(file, () => output)
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
     } else if (error.name.startsWith('Template render error')) {
       new Notice(`${error.name}\n${error.message}`)
-    } else {
-      console.error(error)
     }
+    console.error(error)
   }
 }
 

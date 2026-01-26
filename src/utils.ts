@@ -1,3 +1,4 @@
+import { Template } from 'nunjucks'
 import type { App, TAbstractFile, TFile, TFolder } from 'obsidian'
 
 class EnsureError extends Error {}
@@ -9,6 +10,18 @@ function ensure<T>(value: T, message: string): NonNullable<T> {
     throw new EnsureError(message)
   }
   return value
+}
+
+async function renderTemplate(template: Template, context: Record<string, unknown>) {
+  return new Promise<string>((resolve, reject) => {
+    template.render(context, (err: unknown, result: string) => {
+      if (err) {
+        return reject(err)
+      }
+
+      return resolve(result)
+    })
+  })
 }
 
 function fileIsBlueprint(file: TFile) {
@@ -36,4 +49,4 @@ function isFolder(leaf: TAbstractFile): leaf is TFolder {
   return 'children' in leaf
 }
 
-export { ensure, EnsureError, fileHasBlueprint, fileIsBlueprint, findInTree }
+export { ensure, EnsureError, fileHasBlueprint, fileIsBlueprint, findInTree, renderTemplate }
