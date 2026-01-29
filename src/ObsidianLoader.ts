@@ -1,5 +1,6 @@
 import * as nunjucks from 'nunjucks'
 import { App } from 'obsidian'
+import { BLUEPRINT_FILE_EXTENSION } from './constants'
 
 class ObsidianLoader extends nunjucks.Loader {
   app: App
@@ -15,8 +16,8 @@ class ObsidianLoader extends nunjucks.Loader {
     const file = this.app.vault.getFileByPath(path)
 
     if (!file) {
-      if (!path.endsWith('.blueprint')) {
-        this.getSource(`${path}.blueprint`, callback)
+      if (!path.endsWith(`.${BLUEPRINT_FILE_EXTENSION}`)) {
+        this.getSource(`${path}.${BLUEPRINT_FILE_EXTENSION}`, callback)
         return
       }
       const error = new Error('No such template')

@@ -1,6 +1,12 @@
 import * as nunjucks from 'nunjucks'
 import { Plugin, TFile, TFolder } from 'obsidian'
-import { executeFileBlueprint, executeFolderBlueprints, updateBlueprintNotes } from './commands'
+import {
+  createNoteFromBlueprint,
+  createNoteFromBlueprintInFolder,
+  executeFileBlueprint,
+  executeFolderBlueprints,
+  updateBlueprintNotes,
+} from './commands'
 import { fileHasBlueprint, fileIsBlueprint } from './utils'
 
 export default class BlueprintPlugin extends Plugin {
@@ -13,15 +19,18 @@ export default class BlueprintPlugin extends Plugin {
           menu.addItem((item) => {
             item
               .setTitle('Update all notes with blueprints')
-              .setIcon('layout-dashboard')
               .onClick(async () => executeFolderBlueprints(this.app, file))
+          })
+          menu.addItem((item) => {
+            item
+              .setTitle('New note from blueprint')
+              .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
           })
         }
         if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
           menu.addItem((item) => {
             item
               .setTitle('Apply blueprint')
-              .setIcon('layout-dashboard')
               .onClick(async () => executeFileBlueprint(this.app, file))
           })
         }
@@ -29,7 +38,6 @@ export default class BlueprintPlugin extends Plugin {
           menu.addItem((item) => {
             item
               .setTitle('Update notes using this blueprint')
-              .setIcon('layout-dashboard')
               .onClick(async () => updateBlueprintNotes(this.app, file))
           })
         }
@@ -50,6 +58,14 @@ export default class BlueprintPlugin extends Plugin {
         }
 
         return false
+      },
+    })
+
+    this.addCommand({
+      id: 'create-note-from-blueprint',
+      name: 'Create new note from blueprint',
+      callback: () => {
+        createNoteFromBlueprint(this.app)
       },
     })
 

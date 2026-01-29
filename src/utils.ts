@@ -12,18 +12,6 @@ function ensure<T>(value: T, message: string): NonNullable<T> {
   return value
 }
 
-async function renderTemplate(template: Template, context: Record<string, unknown>) {
-  return new Promise<string>((resolve, reject) => {
-    template.render(context, (err: unknown, result: string) => {
-      if (err) {
-        return reject(err)
-      }
-
-      return resolve(result)
-    })
-  })
-}
-
 function fileIsBlueprint(file: TFile) {
   return file.extension === BLUEPRINT_FILE_EXTENSION
 }
@@ -49,4 +37,15 @@ function isFolder(leaf: TAbstractFile): leaf is TFolder {
   return 'children' in leaf
 }
 
+async function renderTemplate(template: Template, context: Record<string, unknown>) {
+  return new Promise<string>((resolve, reject) => {
+    template.render(context, (err: unknown, result: string) => {
+      if (err) {
+        return reject(err)
+      }
+
+      return resolve(result)
+    })
+  })
+}
 export { ensure, EnsureError, fileHasBlueprint, fileIsBlueprint, findInTree, renderTemplate }

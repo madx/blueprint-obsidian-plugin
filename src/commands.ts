@@ -1,8 +1,44 @@
 import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFolder } from 'obsidian'
 
+import * as path from 'path'
 import { createTemplate } from 'src/createTemplate'
 import { parseSections } from 'src/parseSections'
+import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
+
+async function createNoteFromBlueprint(app: App) {
+  const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
+  const defaultFolder = app.fileManager.getNewFileParent(currentFilePath)
+
+  await createNoteFromBlueprintInFolder(app, defaultFolder.path)
+}
+
+async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
+  const blueprint = await BlueprintSuggestModal.prompt(app)
+
+  if (!blueprint) {
+    return
+  }
+
+  let noteName = 'Untitled.md'
+  let counter = 1
+
+  while (await app.vault.adapter.exists(path.join(folderPath, noteName))) {
+    noteName = `Untitled ${counter}.md`
+    counter++
+  }
+
+  const blueprintLink = app.fileManager.generateMarkdownLink(blueprint, folderPath)
+  const content = ['---', `blueprint: "${blueprintLink}"`, '---'].join('\n')
+  const createdNote = await app.vault.create(path.join(folderPath, noteName), content)
+
+  const mostRecentLeaf = app.workspace.getMostRecentLeaf()
+
+  if (mostRecentLeaf) {
+    mostRecentLeaf.openFile(createdNote)
+    await app.workspace.revealLeaf(mostRecentLeaf)
+  }
+}
 
 async function executeFileBlueprint(app: App, file: TFile) {
   try {
@@ -118,4 +154,10 @@ async function updateBlueprintNotes(app: App, file: TFile) {
   new Notice(`Applied blueprint in ${notesUsingBlueprint.length} notes`)
 }
 
-export { executeFileBlueprint, executeFolderBlueprints, updateBlueprintNotes }
+export {
+  createNoteFromBlueprint,
+  createNoteFromBlueprintInFolder,
+  executeFileBlueprint,
+  executeFolderBlueprints,
+  updateBlueprintNotes,
+}
