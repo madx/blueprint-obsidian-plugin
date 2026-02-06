@@ -1,5 +1,9 @@
 const TO_EMBED_URL_REGEX = /^https?:\/\//
 
+function split(string: string, separator: string) {
+  return string.split(separator)
+}
+
 function toEmbed(link: string, display?: string) {
   if (link.length === 0) {
     return link
@@ -12,4 +16,4 @@ function toEmbed(link: string, display?: string) {
       : `!${link}`
 }
 
-export { toEmbed }
+export { split, toEmbed }
