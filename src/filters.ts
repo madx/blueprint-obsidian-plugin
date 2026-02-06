@@ -1,5 +1,15 @@
+const TO_EMBED_URL_REGEX = /^https?:\/\//
+
 function toEmbed(link: string, display?: string) {
-  return display ? `!${link.replace(/\]\]$/, `|${display}]]`)}` : `!${link}`
+  if (link.length === 0) {
+    return link
+  }
+
+  return TO_EMBED_URL_REGEX.test(link)
+    ? `![${display ?? ''}](${link})`
+    : display
+      ? `!${link.replace(/\]\]$/, `|${display}]]`)}`
+      : `!${link}`
 }
 
 export { toEmbed }
