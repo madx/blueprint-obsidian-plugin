@@ -3,7 +3,7 @@ import * as nunjucks from 'nunjucks'
 import { App, moment } from 'obsidian'
 import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
-import { split, toEmbed } from './filters'
+import { prefixLines, split, toEmbed } from './filters'
 
 type CreateTemplate = {
   app: App
@@ -21,6 +21,7 @@ function createTemplate({ app, blueprint, filePath, sectionsByHeading }: CreateT
 
   env.addGlobal('moment', moment)
 
+  env.addFilter('prefix_lines', prefixLines)
   env.addFilter('split', split)
   env.addFilter('to_embed', toEmbed)
 
