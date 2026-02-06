@@ -23,7 +23,7 @@ export default class BlueprintPlugin extends Plugin {
           })
           menu.addItem((item) => {
             item
-              .setTitle('New note from blueprint')
+              .setTitle('Create new note from blueprint')
               .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
           })
         }
