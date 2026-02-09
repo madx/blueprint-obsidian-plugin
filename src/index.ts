@@ -1,5 +1,6 @@
 import * as nunjucks from 'nunjucks'
 import { Plugin, TFile, TFolder } from 'obsidian'
+import { BlueprintView, VIEW_TYPE_BLUEPRINT } from './BlueprintView'
 import {
   createNoteFromBlueprint,
   createNoteFromBlueprintInFolder,
@@ -7,6 +8,7 @@ import {
   executeFolderBlueprints,
   updateBlueprintNotes,
 } from './commands'
+import { BLUEPRINT_FILE_EXTENSION } from './constants'
 import { fileHasBlueprint, fileIsBlueprint } from './utils'
 
 export default class BlueprintPlugin extends Plugin {
@@ -94,5 +96,8 @@ export default class BlueprintPlugin extends Plugin {
         return false
       },
     })
+
+    this.registerView(VIEW_TYPE_BLUEPRINT, (leaf) => new BlueprintView(leaf))
+    this.registerExtensions([BLUEPRINT_FILE_EXTENSION], VIEW_TYPE_BLUEPRINT)
   }
 }
