@@ -2,6 +2,8 @@ import * as nunjucks from 'nunjucks'
 import { Plugin, TFile, TFolder } from 'obsidian'
 import { BlueprintView, VIEW_TYPE_BLUEPRINT } from './BlueprintView'
 import {
+  createBlueprint,
+  createBlueprintInFolder,
   createNoteFromBlueprint,
   createNoteFromBlueprintInFolder,
   executeFileBlueprint,
@@ -18,6 +20,11 @@ export default class BlueprintPlugin extends Plugin {
     this.registerEvent(
       this.app.workspace.on('file-menu', (menu, file) => {
         if (file instanceof TFolder) {
+          menu.addItem((item) => {
+            item
+              .setTitle('New blueprint')
+              .onClick(async () => createBlueprintInFolder(this.app, file.path))
+          })
           menu.addItem((item) => {
             item
               .setTitle('Update all notes with blueprints')
@@ -69,6 +76,14 @@ export default class BlueprintPlugin extends Plugin {
       callback: async () => {
         const root = this.app.vault.getRoot()
         await executeFolderBlueprints(this.app, root)
+      },
+    })
+
+    this.addCommand({
+      id: 'create-blueprint',
+      name: 'Create new blueprint',
+      callback: () => {
+        createBlueprint(this.app)
       },
     })
 

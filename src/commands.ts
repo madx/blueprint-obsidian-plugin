@@ -6,6 +6,32 @@ import { parseSections } from 'src/parseSections'
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
 
+async function createBlueprint(app: App) {
+  const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
+  const defaultFolder = app.fileManager.getNewFileParent(currentFilePath)
+
+  await createBlueprintInFolder(app, defaultFolder.path)
+}
+
+async function createBlueprintInFolder(app: App, folderPath: string) {
+  let blueprintName = 'Untitled Blueprint.blueprint'
+  let counter = 1
+
+  while (await app.vault.adapter.exists(path.join(folderPath, blueprintName))) {
+    blueprintName = `Untitled Blueprint ${counter}.blueprint`
+    counter++
+  }
+
+  const createdBlueprint = await app.vault.create(path.join(folderPath, blueprintName), '')
+
+  const mostRecentLeaf = app.workspace.getMostRecentLeaf()
+
+  if (mostRecentLeaf) {
+    mostRecentLeaf.openFile(createdBlueprint)
+    await app.workspace.revealLeaf(mostRecentLeaf)
+  }
+}
+
 async function createNoteFromBlueprint(app: App) {
   const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
   const defaultFolder = app.fileManager.getNewFileParent(currentFilePath)
@@ -155,6 +181,8 @@ async function updateBlueprintNotes(app: App, file: TFile) {
 }
 
 export {
+  createBlueprint,
+  createBlueprintInFolder,
   createNoteFromBlueprint,
   createNoteFromBlueprintInFolder,
   executeFileBlueprint,
