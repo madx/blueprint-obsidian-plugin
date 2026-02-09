@@ -116,7 +116,7 @@ This is the updated content of this section.
 
 Then subsequent applications of the blueprint will keep the text untouched.
 
-Blueprint also understands a special `__TOP__` section which includes everything before the first header.
+Blueprint also understands a special `___TOP___` section which includes everything before the first header.
 
 ### Frontmatter
 
