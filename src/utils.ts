@@ -48,4 +48,5 @@ async function renderTemplate(template: Template, context: Record<string, unknow
     })
   })
 }
+
 export { ensure, EnsureError, fileHasBlueprint, fileIsBlueprint, findInTree, renderTemplate }
