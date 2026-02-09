@@ -65,7 +65,6 @@ function parseSections(metadata: CachedMetadata, contents: string) {
       topSection.contents += sectionContents
     } else {
       for (const parentSection of path) {
-        const lastSection = byHeading.at(-1) as Section // We always have at least one section
         parentSection.contents += sectionContents
       }
     }
