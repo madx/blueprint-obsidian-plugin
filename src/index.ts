@@ -72,7 +72,7 @@ export default class BlueprintPlugin extends Plugin {
 
     this.addCommand({
       id: 'apply-blueprints-in-all-notes-in-vault',
-      name: 'Apply blueprint in all notes in vault',
+      name: 'Apply blueprints in all notes in vault',
       callback: async () => {
         const root = this.app.vault.getRoot()
         await executeFolderBlueprints(this.app, root)
