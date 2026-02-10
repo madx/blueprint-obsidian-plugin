@@ -24,13 +24,15 @@ It relies on logical sections in your notes, separated by headings.
 
 Blueprints are built on top of the [Nunjucks][nunjucks] template language, adding some special markup for handling the sections in your notes.
 
-To start using Blueprint, create a template with the `.blueprint` file extension in your Vault, and link it in your note's `blueprint` property.
+To start using Blueprint, create a blueprint file using the `Create new blueprint` command or by right-clicking on a folder and selecting `New blueprint`. It will create a file with the `.blueprint` extension in your Vault. In the note that should use this blueprint, link it as a WikiLink in the `blueprint` property.
 
-You can apply the blueprint by executing the `Blueprint: Apply blueprint` command, or by right clicking on it in the File Explorer then choosing `Apply blueprint`.
+You can apply the blueprint by executing the `Blueprint: Apply blueprint` command, or by right clicking on the note using it in the File Explorer then choosing `Apply blueprint`.
 
-You can apply the referenced blueprint for all notes of a given folder by right-clicking on the folder in the File Explorer and choosing `Update all notes with blueprints`.
+You can apply the referenced blueprint for all notes of a given folder by right-clicking on the folder in the File Explorer and choosing `Update all notes with blueprints`. You can also apply all blueprints in your vault with the `Apply blueprints in all notes in vault` command.
 
 Finally, you can also update all notes using a blueprint either by using the `Blueprint: Update notes using this blueprint` command, or by right clicking on the blueprint file in the explorer and select the `Update notes using this blueprint` option in the context menu.
+
+If you already have blueprints in your vault, you can also use the `Create note from blueprint` command to create a new empty file with a given blueprint. This is also available when right clicking on a folder in the file explorer.
 
 ### Interpolation
 
@@ -181,6 +183,8 @@ Output Markdown
 ![[my_picture.jpg|150]]
 ```
 
+`to_embed` also works for regular URLs.
+
 #### `split`
 
 Splits a string of characters along a given separator.
@@ -191,13 +195,34 @@ Basically the opposite of [`join`](https://mozilla.github.io/nunjucks/templating
 // Outputs a:b:c
 ```
 
-### moment
+### `prefix_lines`
+
+Adds a given prefix at each beginning of line of a string.
+
+```jinja
+{{ "line 1\nline2" | prefix_lines("> ") }}
+// Outputs:
+// > line 1
+// > line 2
+```
+
+### `moment`
 
 Obsidian's default time manipulation library, [`moment`][moment] is exported as a global so you can use it in your blueprints.
 
 ```jinja
-{% set relativeUpdatedAt= moment(updatedAt).fromNow() -%}
+{% set relativeUpdatedAt = moment(updatedAt).fromNow() -%}
 This note was updated {{relativeUpdatedAt}}.
+```
+
+### `get_frontmatter`
+
+Retrieve a note's frontmatter properties.
+
+```jinja
+// Say source contains a wikilink to another note
+{{ get_frontmatter(source).some_property }}
+// Outputs: the value of some_property in the note referenced by source
 ```
 
 [blueprint]: https://github.com/madx/blueprint-obsidian-plugin
