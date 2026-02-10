@@ -27,13 +27,13 @@ export default class BlueprintPlugin extends Plugin {
           })
           menu.addItem((item) => {
             item
-              .setTitle('Update all notes with blueprints')
-              .onClick(async () => executeFolderBlueprints(this.app, file))
+              .setTitle('New note from blueprint')
+              .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
           })
           menu.addItem((item) => {
             item
-              .setTitle('Create new note from blueprint')
-              .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
+              .setTitle('Update all notes with blueprints')
+              .onClick(async () => executeFolderBlueprints(this.app, file))
           })
         }
         if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
