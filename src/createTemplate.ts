@@ -30,7 +30,7 @@ function createGetFrontmatter(app: App, filePath: string) {
 
 function createTemplate({ app, blueprint, filePath, sectionsByHeading }: CreateTemplate) {
   const obsidianLoader = new ObsidianLoader(app)
-  const env = new nunjucks.Environment(obsidianLoader, { autoescape: false, trimBlocks: true })
+  const env = new nunjucks.Environment(obsidianLoader, { autoescape: false })
   const getSection = (sectionName: string, defaultContent = '') =>
     sectionsByHeading[sectionName] || defaultContent
   env.addExtension('SectionExtension', new SectionExtension(getSection))
