@@ -12,11 +12,19 @@ function parseSections(metadata: CachedMetadata, contents: string) {
   const topSection: Section = { level: 0, heading: TOP_SECTION_ID, contents: '' }
   const path: Section[] = []
   const byHeading: Section[] = [topSection]
+  const byRef: Section[] = []
   // We always have a frontmatter since this is required for the blueprint property
   const [frontmatterSection, ...noteSections] = metadata.sections!
   let previousSectionCache: SectionCache = frontmatterSection
 
   for (const sectionCache of noteSections) {
+    if (sectionCache.id) {
+      const markdown = contents
+        .slice(previousSectionCache.position.end.offset, sectionCache.position.end.offset)
+        .trim()
+      byRef.push({ level: 0, heading: sectionCache.id, contents: markdown })
+    }
+
     if (sectionCache.type === 'heading') {
       // We split a header on spaces, first element are the # signs, then a variable length space
       // then the actual heading that we join back, keeping its original spacing
@@ -71,7 +79,9 @@ function parseSections(metadata: CachedMetadata, contents: string) {
     previousSectionCache = sectionCache
   }
 
-  return Object.fromEntries(byHeading.map(({ heading, contents }) => [heading, contents.trim()]))
+  const allSections = [...byHeading, ...byRef]
+
+  return Object.fromEntries(allSections.map(({ heading, contents }) => [heading, contents.trim()]))
 }
 
 export { parseSections }

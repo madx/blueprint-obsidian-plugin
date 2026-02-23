@@ -1,0 +1,106 @@
+{
+  "sections": [
+    {
+      "type": "yaml",
+      "position": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "col": 3,
+          "offset": 44
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 45
+        },
+        "end": {
+          "line": 3,
+          "col": 21,
+          "offset": 66
+        }
+      },
+      "id": "para-ref"
+    },
+    {
+      "type": "callout",
+      "position": {
+        "start": {
+          "line": 5,
+          "col": 0,
+          "offset": 68
+        },
+        "end": {
+          "line": 6,
+          "col": 19,
+          "offset": 120
+        }
+      },
+      "id": "callout-ref"
+    }
+  ],
+  "blocks": {
+    "para-ref": {
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 45
+        },
+        "end": {
+          "line": 3,
+          "col": 21,
+          "offset": 66
+        }
+      },
+      "id": "para-ref"
+    },
+    "callout-ref": {
+      "position": {
+        "start": {
+          "line": 5,
+          "col": 0,
+          "offset": 68
+        },
+        "end": {
+          "line": 6,
+          "col": 19,
+          "offset": 120
+        }
+      },
+      "id": "callout-ref"
+    }
+  },
+  "frontmatter": {
+    "blueprint": "[[Blueprint.blueprint]]"
+  },
+  "frontmatterPosition": {
+    "start": {
+      "line": 0,
+      "col": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 2,
+      "col": 3,
+      "offset": 44
+    }
+  },
+  "frontmatterLinks": [
+    {
+      "key": "blueprint",
+      "link": "Blueprint.blueprint",
+      "original": "[[Blueprint.blueprint]]",
+      "displayText": "Blueprint.blueprint"
+    }
+  ]
+}

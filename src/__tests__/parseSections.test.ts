@@ -151,4 +151,13 @@ describe('parseSections', async () => {
     assert.equal(output[TOP_SECTION_ID], 'Paragraph\n\n- list item 1\n- list item 2')
     assert.isEmpty(output.H1)
   })
+
+  test('extracts blocks with references as sections', async () => {
+    const blockRefs = await loadCase('block_refs')
+    const output = parseSections(blockRefs.metadata, blockRefs.content)
+
+    assert.hasAllKeys(output, [TOP_SECTION_ID, 'para-ref', 'callout-ref'])
+    assert.equal(output['para-ref'], 'A paragraph ^para-ref')
+    assert.equal(output['callout-ref'], '> [!info] A callout ^callout-ref\n> With some content')
+  })
 })
