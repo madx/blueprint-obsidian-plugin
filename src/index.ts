@@ -40,7 +40,7 @@ export default class BlueprintPlugin extends Plugin {
           menu.addItem((item) => {
             item
               .setTitle('Apply blueprint')
-              .onClick(async () => executeFileBlueprint(this.app, file))
+              .onClick(async () => executeFileBlueprint(this.app, file, true))
           })
         }
         if (file instanceof TFile && fileIsBlueprint(file)) {
@@ -61,7 +61,7 @@ export default class BlueprintPlugin extends Plugin {
 
         if (file && fileHasBlueprint(this.app, file)) {
           if (!checking) {
-            executeFileBlueprint(this.app, file)
+            executeFileBlueprint(this.app, file, true)
           }
           return true
         }
