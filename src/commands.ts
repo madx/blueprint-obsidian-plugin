@@ -134,6 +134,8 @@ async function executeFileBlueprint(app: App, file: TFile) {
     // Update note
     const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
     await app.vault.process(file, () => output)
+
+    new Notice(`Applied blueprint`)
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
