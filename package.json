@@ -13,13 +13,13 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.3.0",
     "@types/nunjucks": "^3.2.6",
     "@typescript-eslint/eslint-plugin": "8.54.0",
     "@typescript-eslint/parser": "8.54.0",
     "builtin-modules": "5.0.0",
     "esbuild": "0.27.2",
-    "happy-dom": "^20.4.0",
+    "happy-dom": "^20.7.0",
     "obsidian": "latest",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
@@ -28,6 +28,14 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.10.2",
+    "@codemirror/lang-jinja": "^6.0.0",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.15",
+    "@lezer/common": "^1.5.1",
+    "@lezer/generator": "^1.8.0",
+    "@lezer/highlight": "^1.2.3",
     "nunjucks": "^3.2.4"
   }
 }

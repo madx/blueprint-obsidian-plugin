@@ -1,6 +1,8 @@
 import * as nunjucks from 'nunjucks'
 import { Menu, Plugin, TFile, TFolder } from 'obsidian'
-import { BlueprintView, VIEW_TYPE_BLUEPRINT } from './BlueprintView'
+import { BlueprintExtendedView, VIEW_TYPE_BLUEPRINT } from './BlueprintExtendedView'
+import { BlueprintSettingTab } from './BlueprintSettingTab'
+import { BlueprintView } from './BlueprintView'
 import {
   createBlueprint,
   createBlueprintInFolder,
@@ -14,8 +16,21 @@ import {
 import { BLUEPRINT_FILE_EXTENSION } from './constants'
 import { fileHasBlueprint, fileIsBlueprint } from './utils'
 
+interface BlueprintPluginSettings {
+  experimentalHasBlueprintSyntaxHighlight: boolean
+}
+
+const DEFAULT_SETTINGS: Partial<BlueprintPluginSettings> = {
+  experimentalHasBlueprintSyntaxHighlight: false,
+}
+
 export default class BlueprintPlugin extends Plugin {
+  settings: BlueprintPluginSettings
+
   async onload() {
+    await this.loadSettings()
+
+    this.addSettingTab(new BlueprintSettingTab(this.app, this))
     nunjucks.configure({ autoescape: false, trimBlocks: true })
 
     this.registerEvent(
@@ -125,7 +140,38 @@ export default class BlueprintPlugin extends Plugin {
       },
     })
 
-    this.registerView(VIEW_TYPE_BLUEPRINT, (leaf) => new BlueprintView(leaf))
+    this.addCommand({
+      id: 'dump-cached-metadata',
+      name: "Dump current file's CachedMetadata",
+      callback: async () => {
+        const file = this.app.workspace.getActiveFile()
+
+        if (file) {
+          const cachedMetadata = this.app.metadataCache.getFileCache(file)
+          const dumpFileName = `${file.path.replace(/\.md$/, '.json')}`
+          try {
+            await this.app.vault.create(dumpFileName, JSON.stringify(cachedMetadata, null, 2))
+          } catch (error: unknown) {
+            const dumpFile = this.app.vault.getFileByPath(dumpFileName)!
+            await this.app.vault.modify(dumpFile, JSON.stringify(cachedMetadata, null, 2))
+          }
+        }
+      },
+    })
+
     this.registerExtensions([BLUEPRINT_FILE_EXTENSION], VIEW_TYPE_BLUEPRINT)
+    this.registerView(VIEW_TYPE_BLUEPRINT, (leaf) =>
+      this.settings.experimentalHasBlueprintSyntaxHighlight
+        ? new BlueprintExtendedView(leaf)
+        : new BlueprintView(leaf),
+    )
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings)
   }
 }
