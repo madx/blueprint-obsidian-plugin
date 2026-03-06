@@ -61,8 +61,12 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
   const mostRecentLeaf = app.workspace.getMostRecentLeaf()
 
   if (mostRecentLeaf) {
-    mostRecentLeaf.openFile(createdNote)
+    await mostRecentLeaf.openFile(createdNote)
     await app.workspace.revealLeaf(mostRecentLeaf)
+
+    mostRecentLeaf.setEphemeralState({
+      rename: "all"
+    })
   }
 }
 
