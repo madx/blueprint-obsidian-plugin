@@ -66,7 +66,7 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
   }
 }
 
-async function executeFileBlueprint(app: App, file: TFile, notify?: boolean) {
+async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolean) {
   try {
     const metadata = ensure(
       app.metadataCache.getFileCache(file),
@@ -135,7 +135,9 @@ async function executeFileBlueprint(app: App, file: TFile, notify?: boolean) {
     const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
     await app.vault.process(file, () => output)
 
-    if (notify) new Notice(`Applied blueprint`)
+    if (shouldNotify) {
+      new Notice('Applied blueprint')
+    }
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
