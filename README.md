@@ -6,7 +6,8 @@ Blueprint templates use the [Nunjucks][nunjucks] templating engine, with additio
 
 ## Install
 
-Currently, the easiest way to install Blueprint is through [BRAT][brat] or manually by building it locally.
+- You can install Blueprint through the [official Obsidian Plugins community store][blueprint-plugin]
+- You can also use [BRAT][brat] or build it locally if you want to test latest updates before they are published.
 
 ## Documentation
 
@@ -15,7 +16,7 @@ Currently, the easiest way to install Blueprint is through [BRAT][brat] or manua
 - [Sections](#sections)
 
 > [!NOTE]
-> This documentation might be a bit basic, feel free to reach me on Obsidian's Discord server, I'm @koleir there.
+> I'm currently building a proper documentation site with examples. Meanwhile feel free to reach me on Obsidian's Discord server if you have questions about Blueprint, I'm @koleir there.
 
 ### Setting-up your notes
 
@@ -24,13 +25,13 @@ It relies on logical sections in your notes, separated by headings.
 
 Blueprints are built on top of the [Nunjucks][nunjucks] template language, adding some special markup for handling the sections in your notes.
 
-To start using Blueprint, create a blueprint file using the `Create new blueprint` command or by right-clicking on a folder and selecting `New blueprint`. It will create a file with the `.blueprint` extension in your Vault. In the note that should use this blueprint, link it as a WikiLink in the `blueprint` property.
+To start using Blueprint, create a blueprint file using the `Create new blueprint` command or by right-clicking on a folder and selecting `Blueprint > New blueprint`. It will create a file with the `.blueprint` extension in your Vault. In the note that should use this blueprint, link it as a WikiLink in the `blueprint` property.
 
-You can apply the blueprint by executing the `Blueprint: Apply blueprint` command, or by right clicking on the note using it in the File Explorer then choosing `Apply blueprint`.
+You can apply the blueprint by executing the `Blueprint: Apply blueprint` command, or by right clicking on the note using it in the File Explorer then choosing `Blueprint > Apply blueprint`.
 
-You can apply the referenced blueprint for all notes of a given folder by right-clicking on the folder in the File Explorer and choosing `Update all notes with blueprints`. You can also apply all blueprints in your vault with the `Apply blueprints in all notes in vault` command.
+You can apply the referenced blueprint for all notes of a given folder by right-clicking on the folder in the File Explorer and choosing `Blueprint > Update all notes with blueprints`. You can also apply all blueprints in your vault with the `Blueprint > Apply blueprints in all notes in vault` command.
 
-Finally, you can also update all notes using a blueprint either by using the `Blueprint: Update notes using this blueprint` command, or by right clicking on the blueprint file in the explorer and select the `Update notes using this blueprint` option in the context menu.
+Finally, you can also update all notes using a blueprint either by using the `Blueprint: Update notes using this blueprint` command, or by right clicking on the blueprint file in the explorer and select the `Blueprint > Update notes using this blueprint` option in the context menu.
 
 If you already have blueprints in your vault, you can also use the `Create note from blueprint` command to create a new empty file with a given blueprint. This is also available when right clicking on a folder in the file explorer.
 
@@ -119,6 +120,8 @@ This is the updated content of this section.
 Then subsequent applications of the blueprint will keep the text untouched.
 
 Blueprint also understands a special `___TOP___` section which includes everything before the first header.
+
+Finally, Blueprint also treats [anchored blocks][docs:obsidian:anchored-blocks] as sections, so you can use these as well.
 
 ### Frontmatter
 
@@ -226,7 +229,9 @@ Retrieve a note's frontmatter properties.
 ```
 
 [blueprint]: https://github.com/madx/blueprint-obsidian-plugin
+[blueprint-plugin]: https://obsidian.md/plugins?id=blueprint
 [obsidian]: https://obsidian.md/
 [nunjucks]: https://mozilla.github.io/nunjucks/
 [brat]: https://github.com/TfTHacker/obsidian42-brat
 [moment]: https://momentjs.com
+[docs:obsidian:anchored-blocks]: https://obsidian.md/help/links#Link%20to%20a%20block%20in%20a%20note
