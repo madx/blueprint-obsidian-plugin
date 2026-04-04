@@ -1,5 +1,5 @@
 import * as nunjucks from 'nunjucks'
-import { Plugin, TFile, TFolder } from 'obsidian'
+import { Menu, Plugin, TFile, TFolder } from 'obsidian'
 import { BlueprintView, VIEW_TYPE_BLUEPRINT } from './BlueprintView'
 import {
   createBlueprint,
@@ -19,37 +19,44 @@ export default class BlueprintPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on('file-menu', (menu, file) => {
-        if (file instanceof TFolder) {
-          menu.addItem((item) => {
-            item
-              .setTitle('New blueprint')
-              .onClick(async () => createBlueprintInFolder(this.app, file.path))
-          })
-          menu.addItem((item) => {
-            item
-              .setTitle('New note from blueprint')
-              .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
-          })
-          menu.addItem((item) => {
-            item
-              .setTitle('Update all notes with blueprints')
-              .onClick(async () => executeFolderBlueprints(this.app, file))
-          })
-        }
-        if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
-          menu.addItem((item) => {
-            item
-              .setTitle('Apply blueprint')
-              .onClick(async () => executeFileBlueprint(this.app, file, true))
-          })
-        }
-        if (file instanceof TFile && fileIsBlueprint(file)) {
-          menu.addItem((item) => {
-            item
-              .setTitle('Update notes using this blueprint')
-              .onClick(async () => updateBlueprintNotes(this.app, file))
-          })
-        }
+        menu.addItem((item) => {
+          item.setTitle('Blueprint').setIcon('layout')
+
+          // @ts-ignore
+          const subMenu: Menu = item.setSubmenu()
+
+          if (file instanceof TFolder) {
+            subMenu.addItem((item) => {
+              item
+                .setTitle('New blueprint')
+                .onClick(async () => createBlueprintInFolder(this.app, file.path))
+            })
+            subMenu.addItem((item) => {
+              item
+                .setTitle('New note from blueprint')
+                .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
+            })
+            subMenu.addItem((item) => {
+              item
+                .setTitle('Update all notes with blueprints')
+                .onClick(async () => executeFolderBlueprints(this.app, file))
+            })
+          }
+          if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
+            subMenu.addItem((item) => {
+              item
+                .setTitle('Apply blueprint')
+                .onClick(async () => executeFileBlueprint(this.app, file, true))
+            })
+          }
+          if (file instanceof TFile && fileIsBlueprint(file)) {
+            subMenu.addItem((item) => {
+              item
+                .setTitle('Update notes using this blueprint')
+                .onClick(async () => updateBlueprintNotes(this.app, file))
+            })
+          }
+        })
       }),
     )
 
