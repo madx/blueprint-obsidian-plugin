@@ -153,6 +153,27 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
   }
 }
 
+async function executeFolderBlueprint(app: App, root: TFolder) {
+  const blueprint = await BlueprintSuggestModal.prompt(app)
+
+  if (!blueprint) {
+    return
+  }
+
+  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf, blueprint))
+
+  if (files.length === 0) {
+    new Notice(`No notes with blueprint ${blueprint.path} found in ${root.path}`)
+    return
+  }
+
+  for (const file of files) {
+    await executeFileBlueprint(app, file)
+  }
+
+  new Notice(`Applied blueprint ${blueprint.path} in ${files.length} notes`)
+}
+
 async function executeFolderBlueprints(app: App, root: TFolder) {
   const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf))
 
@@ -195,6 +216,7 @@ export {
   createNoteFromBlueprint,
   createNoteFromBlueprintInFolder,
   executeFileBlueprint,
+  executeFolderBlueprint,
   executeFolderBlueprints,
   updateBlueprintNotes,
 }

@@ -7,6 +7,7 @@ import {
   createNoteFromBlueprint,
   createNoteFromBlueprintInFolder,
   executeFileBlueprint,
+  executeFolderBlueprint,
   executeFolderBlueprints,
   updateBlueprintNotes,
 } from './commands'
@@ -40,6 +41,11 @@ export default class BlueprintPlugin extends Plugin {
               item
                 .setTitle('Update all notes with blueprints')
                 .onClick(async () => executeFolderBlueprints(this.app, file))
+            })
+            subMenu.addItem((item) => {
+              item
+                .setTitle('Update all notes using specific blueprint')
+                .onClick(async () => executeFolderBlueprint(this.app, file))
             })
           }
           if (file instanceof TFile && fileHasBlueprint(this.app, file)) {

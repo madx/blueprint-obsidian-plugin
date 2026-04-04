@@ -16,9 +16,15 @@ function fileIsBlueprint(file: TFile) {
   return file.extension === BLUEPRINT_FILE_EXTENSION
 }
 
-function fileHasBlueprint(app: App, file: TFile) {
+function fileHasBlueprint(app: App, file: TFile, blueprint?: TFile) {
   const metadata = app.metadataCache.getFileCache(file)
   const propPath = metadata?.frontmatterLinks?.find((link) => link.key === 'blueprint')
+
+  if (blueprint && propPath) {
+    const target = app.metadataCache.getFirstLinkpathDest(propPath.link, file.path)
+
+    return target?.path === blueprint.path
+  }
 
   return Boolean(propPath)
 }
