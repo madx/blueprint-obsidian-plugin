@@ -36,7 +36,7 @@ class BlueprintSuggestModal extends FuzzySuggestModal<TFile> {
 
   onClose(): void {
     // We add a small delay here because onClose is initially run before onChooseItem
-    setTimeout(() => {
+    activeWindow.setTimeout(() => {
       this.onFinish(this.selectedBlueprint)
     }, 0)
   }

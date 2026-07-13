@@ -13,10 +13,11 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "parserOptions": {
-    "sourceType": "module",
+    "sourceType": "module"
   },
   "rules": {
     "no-unused-vars": "off",
+    "require-await": "error",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {

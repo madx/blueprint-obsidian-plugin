@@ -38,12 +38,11 @@ class BlueprintHighlighter implements PluginValue {
   constructor(view: EditorView) {
     this.tree = jinjaSupport.language.parser.parse(view.state.doc.toString())
     this.fragments = TreeFragment.addTree(this.tree)
-    this.decorations = this.buildDecorations(view) ?? Decoration.none
+    this.decorations = this.buildDecorations() ?? Decoration.none
   }
 
-  buildDecorations(view: EditorView): DecorationSet {
+  buildDecorations(): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>()
-    const selection = view.state.selection
 
     const node = this.tree.cursor()
     while (node.next()) {
@@ -69,7 +68,7 @@ class BlueprintHighlighter implements PluginValue {
     else if (tree != this.tree || update.viewportChanged || update.selectionSet) {
       this.tree = tree
       this.fragments = TreeFragment.addTree(this.tree, this.fragments)
-      this.decorations = this.buildDecorations(update.view) ?? Decoration.none
+      this.decorations = this.buildDecorations() ?? Decoration.none
     }
   }
 }
@@ -88,7 +87,7 @@ class BlueprintExtendedView extends MarkdownView {
   }
 
   async onLoadFile(file: TFile) {
-    super.onLoadFile(file)
+    await super.onLoadFile(file)
 
     if (this.getMode() === 'source') {
       // @ts-expect-error
@@ -97,7 +96,7 @@ class BlueprintExtendedView extends MarkdownView {
       this.currentMode.toggleSource()
     }
 
-    setTimeout(() => {
+    activeWindow.setTimeout(() => {
       // @ts-expect-error
       const cm = this.editor.cm as EditorView
       cm.dispatch({

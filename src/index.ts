@@ -89,7 +89,7 @@ export default class BlueprintPlugin extends Plugin {
 
         if (file && fileHasBlueprint(this.app, file)) {
           if (!checking) {
-            executeFileBlueprint(this.app, file, true)
+            void executeFileBlueprint(this.app, file, true)
           }
           return true
         }
@@ -111,7 +111,7 @@ export default class BlueprintPlugin extends Plugin {
       id: 'create-blueprint',
       name: 'Create new blueprint',
       callback: () => {
-        createBlueprint(this.app)
+        void createBlueprint(this.app)
       },
     })
 
@@ -119,7 +119,7 @@ export default class BlueprintPlugin extends Plugin {
       id: 'create-note-from-blueprint',
       name: 'Create new note from blueprint',
       callback: () => {
-        createNoteFromBlueprint(this.app)
+        void createNoteFromBlueprint(this.app)
       },
     })
 
@@ -131,7 +131,7 @@ export default class BlueprintPlugin extends Plugin {
 
         if (file && fileIsBlueprint(file)) {
           if (!checking) {
-            updateBlueprintNotes(this.app, file)
+            void updateBlueprintNotes(this.app, file)
           }
           return true
         }
@@ -151,7 +151,7 @@ export default class BlueprintPlugin extends Plugin {
           const dumpFileName = `${file.path.replace(/\.md$/, '.json')}`
           try {
             await this.app.vault.create(dumpFileName, JSON.stringify(cachedMetadata, null, 2))
-          } catch (error: unknown) {
+          } catch (_: unknown) {
             const dumpFile = this.app.vault.getFileByPath(dumpFileName)!
             await this.app.vault.modify(dumpFile, JSON.stringify(cachedMetadata, null, 2))
           }

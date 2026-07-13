@@ -22,7 +22,7 @@ function createGetFrontmatter(app: App, filePath: string) {
     const target = app.metadataCache.getFirstLinkpathDest(cleanTargetPath, filePath)
 
     if (!target) {
-      throw `Unable to resolve ${targetPath}`
+      throw new Error(`Unable to resolve ${targetPath}`)
     }
 
     return app.metadataCache.getFileCache(target)?.frontmatter ?? {}
