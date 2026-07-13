@@ -127,7 +127,41 @@ Then subsequent applications of the blueprint will keep the text untouched.
 
 Blueprint also understands a special `___TOP___` section which includes everything before the first header.
 
-Finally, Blueprint also treats [anchored blocks][docs:obsidian:anchored-blocks] as sections, so you can use these as well.
+Blueprint also treats [anchored blocks][docs:obsidian:anchored-blocks] as sections, so you can use these as well.
+
+#### Section ranges
+
+You can pass a second argument to `section` and Blueprint will include all content until that specified header.
+The second header must be of the same level as the first one.
+
+```jinja2
+## Traits
+
+{% section "Traits", "Additional details" %}{% endsection %}
+
+## Additional details
+
+{% section "Additional details" %}{% endsection %}
+```
+
+Will properly keep the added content in a note looking like:
+
+```jinja2
+## Traits
+
+- Agile
+- Calm
+
+## Background information
+
+Born in the big city of Arakkor
+
+## Goals
+
+Wants to be a hero
+
+## Additional details
+```
 
 ### Frontmatter
 
