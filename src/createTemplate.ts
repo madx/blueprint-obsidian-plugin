@@ -4,12 +4,13 @@ import { App, moment } from 'obsidian'
 import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
 import { prefixLines, split, toEmbed } from './filters'
+import { SectionData } from './parseSections'
 
 type CreateTemplate = {
   app: App
   blueprint: string
   filePath: string
-  sectionsByHeading: Record<string, string>
+  sectionData: SectionData
 }
 
 function createGetFrontmatter(app: App, filePath: string) {
@@ -28,12 +29,10 @@ function createGetFrontmatter(app: App, filePath: string) {
   }
 }
 
-function createTemplate({ app, blueprint, filePath, sectionsByHeading }: CreateTemplate) {
+function createTemplate({ app, blueprint, filePath, sectionData }: CreateTemplate) {
   const obsidianLoader = new ObsidianLoader(app)
   const env = new nunjucks.Environment(obsidianLoader, { autoescape: false })
-  const getSection = (sectionName: string, defaultContent = '') =>
-    sectionsByHeading[sectionName] || defaultContent
-  env.addExtension('SectionExtension', new SectionExtension(getSection))
+  env.addExtension('SectionExtension', new SectionExtension(sectionData))
 
   env.addGlobal('moment', moment)
   env.addGlobal('get_frontmatter', createGetFrontmatter(app, filePath))

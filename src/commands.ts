@@ -89,7 +89,7 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
     const blueprint = await app.vault.cachedRead(blueprintFilePath)
     const fileContent = await app.vault.read(file)
     const filePath = file.path
-    const sectionsByHeading = parseSections(metadata, fileContent)
+    const sectionData = parseSections(metadata, fileContent)
 
     // Render blueprint's frontmatter then merge it with the note's frontmatter
     const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
@@ -108,7 +108,7 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
     const frontmatterTemplate = createTemplate({
       app,
       filePath,
-      sectionsByHeading,
+      sectionData,
       blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
     })
     const frontmatterContext = { file, frontmatter: mergedFrontmatter, ...mergedFrontmatter }
@@ -130,7 +130,7 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
     const contentTemplate = createTemplate({
       app,
       filePath,
-      sectionsByHeading,
+      sectionData,
       blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
     })
     const contentContext = { file, frontmatter, ...frontmatter }

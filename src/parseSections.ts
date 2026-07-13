@@ -2,16 +2,22 @@ import type { CachedMetadata, SectionCache } from 'obsidian'
 
 type Section = {
   level: number
-  heading: string
+  name: string
   contents: string
+  header?: string
+}
+
+export type SectionData = {
+  byName: Record<string, string>
+  list: Section[]
 }
 
 export const TOP_SECTION_ID = '___TOP___' as const
 
-function parseSections(metadata: CachedMetadata, contents: string) {
-  const topSection: Section = { level: 0, heading: TOP_SECTION_ID, contents: '' }
+function parseSections(metadata: CachedMetadata, contents: string): SectionData {
+  const topSection: Section = { level: 0, name: TOP_SECTION_ID, contents: '' }
   const path: Section[] = []
-  const byHeading: Section[] = [topSection]
+  const sections: Section[] = [topSection]
   const byRef: Section[] = []
   // We always have a frontmatter since this is required for the blueprint property
   const [frontmatterSection, ...noteSections] = metadata.sections!
@@ -22,7 +28,7 @@ function parseSections(metadata: CachedMetadata, contents: string) {
       const markdown = contents
         .slice(previousSectionCache.position.end.offset, sectionCache.position.end.offset)
         .trim()
-      byRef.push({ level: 0, heading: sectionCache.id, contents: markdown })
+      sections.push({ level: 0, name: sectionCache.id, contents: markdown })
     }
 
     if (sectionCache.type === 'heading') {
@@ -34,12 +40,12 @@ function parseSections(metadata: CachedMetadata, contents: string) {
       )
       const [hashes, _, ...headingParts] = markdown.trim().split(/(\s+)/)
       const level = hashes.length
-      const heading = headingParts.join('')
+      const name = headingParts.join('')
 
-      const newSection: Section = { level, heading, contents: '' }
+      const newSection: Section = { level, name, contents: '', header: markdown }
       const previousSection = path.at(-1)
 
-      byHeading.push(newSection)
+      sections.push(newSection)
 
       if (!previousSection) {
         path.push(newSection)
@@ -79,9 +85,10 @@ function parseSections(metadata: CachedMetadata, contents: string) {
     previousSectionCache = sectionCache
   }
 
-  const allSections = [...byHeading, ...byRef]
-
-  return Object.fromEntries(allSections.map(({ heading, contents }) => [heading, contents.trim()]))
+  return {
+    byName: Object.fromEntries(sections.map(({ name, contents }) => [name, contents.trim()])),
+    list: sections,
+  }
 }
 
 export { parseSections }
