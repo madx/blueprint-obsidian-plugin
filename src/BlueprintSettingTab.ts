@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian'
-import BlueprintPlugin from 'src'
+import BlueprintPlugin from './'
 
 class BlueprintSettingTab extends PluginSettingTab {
   plugin: BlueprintPlugin

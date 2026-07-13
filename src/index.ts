@@ -25,7 +25,7 @@ const DEFAULT_SETTINGS: Partial<BlueprintPluginSettings> = {
 }
 
 export default class BlueprintPlugin extends Plugin {
-  settings: BlueprintPluginSettings
+  settings!: BlueprintPluginSettings
 
   async onload() {
     await this.loadSettings()

@@ -30,11 +30,12 @@ function fileHasBlueprint(app: App, file: TFile, blueprint?: TFile) {
 }
 
 function findInTree(root: TFolder, predicate: (leaf: TFile) => boolean): TFile[] {
-  return root.children.flatMap((leaf: TFile | TFolder) => {
+  return root.children.flatMap((leaf: TAbstractFile) => {
     if (isFolder(leaf)) {
       return findInTree(leaf, predicate)
     } else {
-      return predicate(leaf) ? leaf : []
+      const fileLeaf = leaf as TFile
+      return predicate(fileLeaf) ? fileLeaf : []
     }
   })
 }
@@ -45,12 +46,12 @@ function isFolder(leaf: TAbstractFile): leaf is TFolder {
 
 async function renderTemplate(template: Template, context: Record<string, unknown>) {
   return new Promise<string>((resolve, reject) => {
-    template.render(context, (err: unknown, result: string) => {
+    template.render(context, (err: unknown, result: string | null) => {
       if (err) {
         return reject(err)
       }
 
-      return resolve(result)
+      return resolve(result || '')
     })
   })
 }

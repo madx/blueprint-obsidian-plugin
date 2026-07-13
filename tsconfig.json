@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
-    "module": "esnext",
+    "module": "preserve",
     "target": "esnext",
     "allowJs": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
@@ -15,6 +14,9 @@
     "lib": [
       "DOM",
       "ESNext"
+    ],
+    "types": [
+      "node"
     ]
   },
   "include": [

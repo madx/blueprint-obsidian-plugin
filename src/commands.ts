@@ -1,9 +1,9 @@
 import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFolder } from 'obsidian'
 
 import * as path from 'path'
-import { createTemplate } from 'src/createTemplate'
-import { parseSections } from 'src/parseSections'
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
+import { createTemplate } from './createTemplate'
+import { parseSections } from './parseSections'
 import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
 
 async function createBlueprint(app: App) {
@@ -146,7 +146,7 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
-    } else if (error.name.startsWith('Template render error')) {
+    } else if (error instanceof Error && error.name.startsWith('Template render error')) {
       new Notice(`${error.name}\n${error.message}`)
     }
     console.error(error)
