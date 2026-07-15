@@ -24,11 +24,13 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
   let previousSectionCache: SectionCache = frontmatterSection
 
   for (const sectionCache of noteSections) {
-    if (sectionCache.id) {
+    if (sectionCache.id && sectionCache.type !== 'heading') {
       const markdown = contents
         .slice(previousSectionCache.position.end.offset, sectionCache.position.end.offset)
         .trim()
       sections.push({ level: 0, name: sectionCache.id, contents: markdown })
+      previousSectionCache = sectionCache
+      continue
     }
 
     if (sectionCache.type === 'heading') {
