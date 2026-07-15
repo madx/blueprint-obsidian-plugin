@@ -1,7 +1,7 @@
 {
 	"id": "blueprint",
 	"name": "Blueprint",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"minAppVersion": "1.7.2",
 	"description": "Write once, update everywhere - note templates that pull from Properties.",
 	"author": "François Vaux (@koleir)",
