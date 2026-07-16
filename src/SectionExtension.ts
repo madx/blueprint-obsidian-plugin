@@ -45,12 +45,8 @@ class SectionExtension {
       const firstSectionIndex = sectionList.findIndex((section) => section.name === startName)
       const lastSectionIndex = sectionList.findIndex((section) => section.name === endName)
 
-      if (firstSectionIndex < 0) {
-        throw `Unable to find section ${startName}`
-      }
-
-      if (lastSectionIndex < 0) {
-        throw `Unable to find section ${endName}`
+      if (firstSectionIndex < 0 || lastSectionIndex < 0) {
+        return defaultContent
       }
 
       const firstSectionLevel = sectionList[firstSectionIndex].level
