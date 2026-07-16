@@ -30,9 +30,13 @@ class SectionExtension {
   run(
     _: any,
     startName: string,
-    defaultContent?: string | (() => string),
-  ): nunjucks.runtime.SafeString
-  run(_: any, startName: string, endName: string | (() => string), defaultContent?: () => string) {
+    endName: string | (() => string),
+    defaultContent?: () => string,
+  ): nunjucks.runtime.SafeString {
+    if (defaultContent === undefined && typeof endName === 'function') {
+      defaultContent = endName
+    }
+
     const getSection = (startName: string, defaultContent: string) => {
       return this.sectionData.byName[startName] || defaultContent
     }
