@@ -1,5 +1,5 @@
 import * as nunjucks from 'nunjucks'
-import { SectionData } from './parseSections'
+import { END_SECTION_ID, SectionData } from './parseSections'
 
 /**
  * This file is poorly typed, mainly because nunjucks' parser API is also poorly typed
@@ -43,7 +43,10 @@ class SectionExtension {
     const getSectionRange = (startName: string, endName: string, defaultContent: string) => {
       const sectionList = this.sectionData.list
       const firstSectionIndex = sectionList.findIndex((section) => section.name === startName)
-      const lastSectionIndex = sectionList.findIndex((section) => section.name === endName)
+      const lastSectionIndex =
+        endName === END_SECTION_ID
+          ? sectionList.length
+          : sectionList.findIndex((section) => section.name === endName)
 
       if (firstSectionIndex < 0 || lastSectionIndex < 0) {
         return defaultContent

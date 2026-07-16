@@ -13,6 +13,7 @@ export type SectionData = {
 }
 
 export const TOP_SECTION_ID = '___TOP___' as const
+export const END_SECTION_ID = '___END___' as const
 
 function parseSections(metadata: CachedMetadata, contents: string): SectionData {
   const topSection: Section = { level: 0, name: TOP_SECTION_ID, contents: '' }
