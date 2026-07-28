@@ -10,10 +10,19 @@ type Section = {
 export type SectionData = {
   byName: Record<string, string>
   list: Section[]
+  /**
+   * Note content running from the first heading of at least the given level to the end of the
+   * file, verbatim, keyed by that level. Empty when the note has no heading that deep.
+   * Lets a blueprint emit a preamble containing headings of its own, as long as the note's
+   * own content starts at a deeper level than anything the preamble emits.
+   */
+  rest: Record<number, string>
 }
 
 export const TOP_SECTION_ID = '___TOP___' as const
 export const END_SECTION_ID = '___END___' as const
+export const REST_SECTION_ID = '___REST___' as const
+export const MAX_HEADING_LEVEL = 6 as const
 
 function parseSections(metadata: CachedMetadata, contents: string): SectionData {
   const topSection: Section = { level: 0, name: TOP_SECTION_ID, contents: '' }
@@ -23,6 +32,8 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
   // We always have a frontmatter since this is required for the blueprint property
   const [frontmatterSection, ...noteSections] = metadata.sections!
   let previousSectionCache: SectionCache = frontmatterSection
+  // Start offset of the first heading at each level, used to build the ___REST___ pseudo-section
+  const firstHeadingOffsetByLevel: (number | null)[] = new Array(MAX_HEADING_LEVEL + 1).fill(null)
 
   for (const sectionCache of noteSections) {
     if (sectionCache.id && sectionCache.type !== 'heading') {
@@ -44,6 +55,10 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
       const [hashes, _, ...headingParts] = markdown.trim().split(/(\s+)/)
       const level = hashes.length
       const name = headingParts.join('')
+
+      if (level <= MAX_HEADING_LEVEL && firstHeadingOffsetByLevel[level] === null) {
+        firstHeadingOffsetByLevel[level] = sectionCache.position.start.offset
+      }
 
       const newSection: Section = { level, name, contents: '', header: markdown }
       const previousSection = path.at(-1)
@@ -88,9 +103,20 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
     previousSectionCache = sectionCache
   }
 
+  // The first heading of at least level N is the earliest of the first headings of every level
+  // from N down, since offsets increase with document order
+  const rest: Record<number, string> = {}
+  for (let minLevel = 1; minLevel <= MAX_HEADING_LEVEL; minLevel++) {
+    const offsets = firstHeadingOffsetByLevel
+      .slice(minLevel)
+      .filter((offset): offset is number => offset !== null)
+    rest[minLevel] = offsets.length === 0 ? '' : contents.slice(Math.min(...offsets)).trim()
+  }
+
   return {
     byName: Object.fromEntries(sections.map(({ name, contents }) => [name, contents.trim()])),
     list: sections,
+    rest,
   }
 }
 

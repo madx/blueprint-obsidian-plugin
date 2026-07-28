@@ -163,4 +163,53 @@ describe('parseSections', async () => {
       '> [!info] A callout ^callout-ref\n> With some content',
     )
   })
+
+  test('collects everything from the first heading onwards in rest', async () => {
+    const h1H3ParaH2Para = await loadCase('h1_h3_para_h2_para')
+    const output = parseSections(h1H3ParaH2Para.metadata, h1H3ParaH2Para.content)
+
+    assert.equal(output.rest[1], '# H1\n### H3\nParagraph 1\n## H2\nParagraph 2')
+  })
+
+  test('excludes content preceding the first heading from rest', async () => {
+    const topH1 = await loadCase('top_h1')
+    const output = parseSections(topH1.metadata, topH1.content)
+
+    assert.equal(output.rest[1], '# H1')
+    assert.notInclude(output.rest[1], 'list item 1')
+  })
+
+  test('leaves rest empty when the note has no headings', async () => {
+    const blockRefs = await loadCase('block_refs')
+    const output = parseSections(blockRefs.metadata, blockRefs.content)
+
+    assert.isEmpty(output.rest[1])
+  })
+
+  test('excludes the frontmatter from rest', async () => {
+    const singleH1 = await loadCase('single_h1')
+    const output = parseSections(singleH1.metadata, singleH1.content)
+
+    assert.equal(output.rest[1], '# H1')
+  })
+
+  test('anchors rest on the first heading of at least the requested level', async () => {
+    const h1H3ParaH2Para = await loadCase('h1_h3_para_h2_para')
+    const output = parseSections(h1H3ParaH2Para.metadata, h1H3ParaH2Para.content)
+
+    // # H1 / ### H3 / Paragraph 1 / ## H2 / Paragraph 2
+    assert.equal(output.rest[1], '# H1\n### H3\nParagraph 1\n## H2\nParagraph 2')
+    // the first heading of level >= 2 is the H3, not the later H2
+    assert.equal(output.rest[2], '### H3\nParagraph 1\n## H2\nParagraph 2')
+    assert.equal(output.rest[3], '### H3\nParagraph 1\n## H2\nParagraph 2')
+    assert.isEmpty(output.rest[4])
+  })
+
+  test('anchors rest below a preamble heading', async () => {
+    const h1ThenH2ThenParagraph = await loadCase('h1_then_h2_then_paragraph')
+    const output = parseSections(h1ThenH2ThenParagraph.metadata, h1ThenH2ThenParagraph.content)
+
+    assert.equal(output.rest[1], '# H1\n## H2\nParagraph')
+    assert.equal(output.rest[2], '## H2\nParagraph')
+  })
 })

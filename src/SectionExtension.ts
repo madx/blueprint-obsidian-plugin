@@ -1,5 +1,5 @@
 import * as nunjucks from 'nunjucks'
-import { END_SECTION_ID, SectionData } from './parseSections'
+import { END_SECTION_ID, MAX_HEADING_LEVEL, REST_SECTION_ID, SectionData } from './parseSections'
 
 /**
  * This file is poorly typed, mainly because nunjucks' parser API is also poorly typed
@@ -30,11 +30,25 @@ class SectionExtension {
   run(
     _: any,
     startName: string,
-    endName: string | (() => string),
+    endName: string | number | (() => string),
     defaultContent?: () => string,
   ): nunjucks.runtime.SafeString {
     if (defaultContent === undefined && typeof endName === 'function') {
       defaultContent = endName
+    }
+
+    // ___REST___ is a pseudo-section: everything from the note's first heading to the end of
+    // the file, verbatim. Unlike a section range it does not filter by heading level, so the
+    // note is free to use whatever heading structure it likes below the blueprint's preamble.
+    // An optional second argument sets the level to anchor on, so that a preamble emitting
+    // headings of its own (a title H1, say) can sit above the note's own content.
+    if (startName === REST_SECTION_ID) {
+      const requestedLevel = typeof endName === 'number' ? endName : 1
+      const minLevel = Math.min(Math.max(Math.trunc(requestedLevel), 1), MAX_HEADING_LEVEL)
+
+      return new nunjucks.runtime.SafeString(
+        this.sectionData.rest[minLevel] || defaultContent?.().trim() || '',
+      )
     }
 
     const getSection = (startName: string, defaultContent: string) => {
