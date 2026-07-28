@@ -7,6 +7,16 @@ type Section = {
   header?: string
 }
 
+/**
+ * A heading as exposed to templates. Deliberately narrower than Section: contents stay
+ * reachable through {% section %} so there is only one way to pull note content into a
+ * blueprint.
+ */
+export type Heading = {
+  level: number
+  name: string
+}
+
 export type SectionData = {
   byName: Record<string, string>
   list: Section[]
@@ -120,4 +130,15 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
   }
 }
 
-export { parseSections }
+/**
+ * The note's headings in document order, for templates that need to inspect or iterate the
+ * structure they are about to render. Excludes the top section and block references, which
+ * are not headings and carry no level.
+ */
+function toHeadings(sectionData: SectionData): Heading[] {
+  return sectionData.list
+    .filter((section) => section.level > 0)
+    .map(({ level, name }) => ({ level, name }))
+}
+
+export { parseSections, toHeadings }

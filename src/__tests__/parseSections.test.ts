@@ -2,7 +2,7 @@ import * as fs from 'fs/promises'
 import { CachedMetadata } from 'obsidian'
 import * as path from 'path'
 import { assert, describe, test } from 'vitest'
-import { parseSections, TOP_SECTION_ID } from '../parseSections'
+import { parseSections, toHeadings, TOP_SECTION_ID } from '../parseSections'
 
 type Case = { metadata: CachedMetadata; content: string }
 async function loadCase(name: string): Promise<Case> {
@@ -211,5 +211,43 @@ describe('parseSections', async () => {
 
     assert.equal(output.rest[1], '# H1\n## H2\nParagraph')
     assert.equal(output.rest[2], '## H2\nParagraph')
+  })
+})
+
+describe('toHeadings', async () => {
+  test('lists headings in document order with their levels', async () => {
+    const h1H3ParaH2Para = await loadCase('h1_h3_para_h2_para')
+    const output = parseSections(h1H3ParaH2Para.metadata, h1H3ParaH2Para.content)
+
+    assert.deepEqual(toHeadings(output), [
+      { level: 1, name: 'H1' },
+      { level: 3, name: 'H3' },
+      { level: 2, name: 'H2' },
+    ])
+  })
+
+  test('keeps repeated headings distinct, unlike byName', async () => {
+    const h1H2H1 = await loadCase('h1_h2_h1')
+    const output = parseSections(h1H2H1.metadata, h1H2H1.content)
+
+    assert.deepEqual(toHeadings(output), [
+      { level: 1, name: 'H1_1' },
+      { level: 2, name: 'H2' },
+      { level: 1, name: 'H1_2' },
+    ])
+  })
+
+  test('excludes the top section', async () => {
+    const topH1 = await loadCase('top_h1')
+    const output = parseSections(topH1.metadata, topH1.content)
+
+    assert.deepEqual(toHeadings(output), [{ level: 1, name: 'H1' }])
+  })
+
+  test('excludes block references, which are not headings', async () => {
+    const blockRefs = await loadCase('block_refs')
+    const output = parseSections(blockRefs.metadata, blockRefs.content)
+
+    assert.isEmpty(toHeadings(output))
   })
 })

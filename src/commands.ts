@@ -3,7 +3,7 @@ import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFold
 import * as path from 'path'
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 import { createTemplate } from './createTemplate'
-import { parseSections } from './parseSections'
+import { parseSections, toHeadings } from './parseSections'
 import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
 
 async function createBlueprint(app: App) {
@@ -133,7 +133,9 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
       sectionData,
       blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
     })
-    const contentContext = { file, frontmatter, ...frontmatter }
+    // headings exposes the note's own structure to the template, so a blueprint can inspect or
+    // iterate what it is about to render rather than having to declare every heading up front
+    const contentContext = { file, frontmatter, headings: toHeadings(sectionData), ...frontmatter }
     const renderedContent = await renderTemplate(contentTemplate, contentContext)
 
     // Update note
