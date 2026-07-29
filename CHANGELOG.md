@@ -1,5 +1,10 @@
 ## Changelog
 
+### 0.9.0
+
+- Add a `___REST___` pseudo-section for note-owned structure
+- Expose the note's headings to the template context
+
 ### 0.2.0
 
 - BREAKING CHANGE: Blueprint files should now use the `.blueprint` file extension.
