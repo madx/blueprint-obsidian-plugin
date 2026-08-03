@@ -137,9 +137,20 @@ async function applyBlueprintToFile(app: App, file: TFile) {
   const contentContext = { file, frontmatter, headings: toHeadings(sectionData), ...frontmatter }
   const renderedContent = await renderTemplate(contentTemplate, contentContext)
 
-  // Update note
+  // Update note, unless it changed while the blueprint was rendering
   const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
-  await app.vault.process(file, () => output)
+  let conflicted = false
+  await app.vault.process(file, (currentContent) => {
+    if (currentContent !== fileContent) {
+      conflicted = true
+      return currentContent
+    }
+    return output
+  })
+
+  if (conflicted) {
+    throw new EnsureError(`${file.basename} changed while applying blueprint, not updating it`)
+  }
 }
 
 async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolean) {

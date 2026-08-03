@@ -15,7 +15,7 @@ import {
   updateBlueprintNotes,
 } from './commands'
 import { BLUEPRINT_FILE_EXTENSION } from './constants'
-import { fileHasBlueprint, fileIsBlueprint } from './utils'
+import { EnsureError, fileHasBlueprint, fileIsBlueprint } from './utils'
 
 interface BlueprintPluginSettings {
   experimentalHasBlueprintSyntaxHighlight: boolean
@@ -25,12 +25,23 @@ const DEFAULT_SETTINGS: Partial<BlueprintPluginSettings> = {
   experimentalHasBlueprintSyntaxHighlight: false,
 }
 
+export { EnsureError } from './utils'
+
 export interface BlueprintPluginApi {
   /**
    * Apply the blueprint linked in the note's `blueprint` frontmatter property,
    * without requiring the note to be open or active. Resolves once the note
-   * has been updated; rejects if the note has no blueprint, the blueprint
-   * cannot be resolved, or rendering fails.
+   * has been updated.
+   *
+   * The note's metadata must already be indexed: if the note was just created
+   * or modified, wait for the metadata cache to reflect the change (e.g. via
+   * `metadataCache.on('changed', ...)`) before calling, otherwise the call
+   * rejects — or renders from stale metadata.
+   *
+   * Rejects with `EnsureError` when a precondition fails (no blueprint link,
+   * blueprint not resolvable, no cached metadata, note changed while
+   * rendering, plugin not loaded), and with the underlying template error
+   * when rendering fails.
    */
   applyToFile: (file: TFile) => Promise<void>
 }
@@ -38,8 +49,15 @@ export interface BlueprintPluginApi {
 export default class BlueprintPlugin extends Plugin {
   declare settings: BlueprintPluginSettings
 
+  private isReady = false
+
   readonly api: BlueprintPluginApi = {
-    applyToFile: (file) => applyBlueprintToFile(this.app, file),
+    applyToFile: async (file) => {
+      if (!this.isReady) {
+        throw new EnsureError('Blueprint plugin is not loaded')
+      }
+      return applyBlueprintToFile(this.app, file)
+    },
   }
 
   async onload() {
@@ -180,6 +198,12 @@ export default class BlueprintPlugin extends Plugin {
         ? new BlueprintExtendedView(leaf)
         : new BlueprintView(leaf),
     )
+
+    this.isReady = true
+  }
+
+  onunload() {
+    this.isReady = false
   }
 
   async loadSettings() {
