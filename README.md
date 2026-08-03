@@ -6,6 +6,17 @@ Blueprint templates use the [Nunjucks][nunjucks] templating engine, plus additio
 
 ## [Documentation][blueprint:docs]
 
+## Scripting API
+
+Other plugins and user scripts (Templater, QuickAdd, etc.) can apply a note's blueprint programmatically, without the note being open or active:
+
+```js
+const blueprint = app.plugins.plugins.blueprint
+await blueprint.api.applyToFile(file) // file: TFile with a `blueprint` frontmatter link
+```
+
+`applyToFile` resolves once the note has been updated and rejects with an error if the note has no blueprint, the blueprint cannot be resolved, or rendering fails. (The *Apply blueprint* command is unchanged: it acts on the active note and reports errors via notices.)
+
 ## Acknowledgements
 
 Thanks to all the early adopters and all the valuable feedback they provided, in particular [SlRvb](https://github.com/SlRvb), [Leah](https://github.com/leah-ferguson), and users Pickleberry and Calavera on Discord.

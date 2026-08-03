@@ -71,76 +71,80 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
   }
 }
 
+async function applyBlueprintToFile(app: App, file: TFile) {
+  const metadata = ensure(
+    app.metadataCache.getFileCache(file),
+    `No cached metadata for ${file.basename}`,
+  )
+  const blueprintPropertyPath = ensure(
+    metadata.frontmatterLinks?.find((link) => link.key === 'blueprint'),
+    'File has no blueprint',
+  )
+  const blueprintFilePath = ensure(
+    app.metadataCache.getFirstLinkpathDest(blueprintPropertyPath?.link, file.path),
+    'Cannot find linked blueprint',
+  )
+
+  const blueprint = await app.vault.cachedRead(blueprintFilePath)
+  const fileContent = await app.vault.read(file)
+  const filePath = file.path
+  const sectionData = parseSections(metadata, fileContent)
+
+  // Render blueprint's frontmatter then merge it with the note's frontmatter
+  const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
+  const noteFrontmatter = metadata?.frontmatter || {}
+  const blueprintFrontmatter =
+    parseYaml(blueprintFrontmatterInfo.frontmatter) ?? ({} as Record<string, unknown>)
+  const missingFrontmatterEntriesBeforeRendering = Object.fromEntries(
+    Object.entries(blueprintFrontmatter).filter(([key]) => !(key in noteFrontmatter)),
+  )
+  const mergedFrontmatter = Object.assign(
+    {},
+    noteFrontmatter,
+    missingFrontmatterEntriesBeforeRendering,
+  )
+
+  const frontmatterTemplate = createTemplate({
+    app,
+    filePath,
+    sectionData,
+    blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
+  })
+  const frontmatterContext = { file, frontmatter: mergedFrontmatter, ...mergedFrontmatter }
+  const renderedBlueprintFrontmatter = await renderTemplate(
+    frontmatterTemplate,
+    frontmatterContext,
+  )
+  const parsedRenderedBlueprintFrontmatter =
+    parseYaml(renderedBlueprintFrontmatter) ?? ({} as Record<string, unknown>)
+  const missingFrontmatterEntriesAfterRendering = Object.fromEntries(
+    Object.entries(parsedRenderedBlueprintFrontmatter).filter(
+      ([key]) => !(key in noteFrontmatter),
+    ),
+  )
+  const frontmatter = Object.assign({}, noteFrontmatter, missingFrontmatterEntriesAfterRendering)
+  const renderedFrontmatter = stringifyYaml(frontmatter).trim()
+
+  // Render the note's content
+  const contentTemplate = createTemplate({
+    app,
+    filePath,
+    sectionData,
+    blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
+  })
+  // headings exposes the note's own structure to the template, so a blueprint can inspect or
+  // iterate what it is about to render rather than having to declare every heading up front
+  const contentContext = { file, frontmatter, headings: toHeadings(sectionData), ...frontmatter }
+  const renderedContent = await renderTemplate(contentTemplate, contentContext)
+
+  // Update note
+  const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
+  await app.vault.process(file, () => output)
+}
+
 async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolean) {
   try {
-    const metadata = ensure(
-      app.metadataCache.getFileCache(file),
-      `No cached metadata for ${file.basename}`,
-    )
-    const blueprintPropertyPath = ensure(
-      metadata.frontmatterLinks?.find((link) => link.key === 'blueprint'),
-      'File has no blueprint',
-    )
-    const blueprintFilePath = ensure(
-      app.metadataCache.getFirstLinkpathDest(blueprintPropertyPath?.link, file.path),
-      'Cannot find linked blueprint',
-    )
-
-    const blueprint = await app.vault.cachedRead(blueprintFilePath)
-    const fileContent = await app.vault.read(file)
-    const filePath = file.path
-    const sectionData = parseSections(metadata, fileContent)
-
-    // Render blueprint's frontmatter then merge it with the note's frontmatter
-    const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
-    const noteFrontmatter = metadata?.frontmatter || {}
-    const blueprintFrontmatter =
-      parseYaml(blueprintFrontmatterInfo.frontmatter) ?? ({} as Record<string, unknown>)
-    const missingFrontmatterEntriesBeforeRendering = Object.fromEntries(
-      Object.entries(blueprintFrontmatter).filter(([key]) => !(key in noteFrontmatter)),
-    )
-    const mergedFrontmatter = Object.assign(
-      {},
-      noteFrontmatter,
-      missingFrontmatterEntriesBeforeRendering,
-    )
-
-    const frontmatterTemplate = createTemplate({
-      app,
-      filePath,
-      sectionData,
-      blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
-    })
-    const frontmatterContext = { file, frontmatter: mergedFrontmatter, ...mergedFrontmatter }
-    const renderedBlueprintFrontmatter = await renderTemplate(
-      frontmatterTemplate,
-      frontmatterContext,
-    )
-    const parsedRenderedBlueprintFrontmatter =
-      parseYaml(renderedBlueprintFrontmatter) ?? ({} as Record<string, unknown>)
-    const missingFrontmatterEntriesAfterRendering = Object.fromEntries(
-      Object.entries(parsedRenderedBlueprintFrontmatter).filter(
-        ([key]) => !(key in noteFrontmatter),
-      ),
-    )
-    const frontmatter = Object.assign({}, noteFrontmatter, missingFrontmatterEntriesAfterRendering)
-    const renderedFrontmatter = stringifyYaml(frontmatter).trim()
-
-    // Render the note's content
-    const contentTemplate = createTemplate({
-      app,
-      filePath,
-      sectionData,
-      blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
-    })
-    // headings exposes the note's own structure to the template, so a blueprint can inspect or
-    // iterate what it is about to render rather than having to declare every heading up front
-    const contentContext = { file, frontmatter, headings: toHeadings(sectionData), ...frontmatter }
-    const renderedContent = await renderTemplate(contentTemplate, contentContext)
-
-    // Update note
-    const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
-    await app.vault.process(file, () => output)
+    await applyBlueprintToFile(app, file)
 
     if (shouldNotify) {
       new Notice('Applied blueprint')
@@ -213,6 +217,7 @@ async function updateBlueprintNotes(app: App, file: TFile) {
 }
 
 export {
+  applyBlueprintToFile,
   createBlueprint,
   createBlueprintInFolder,
   createNoteFromBlueprint,

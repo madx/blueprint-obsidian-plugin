@@ -4,6 +4,7 @@ import { BlueprintExtendedView, VIEW_TYPE_BLUEPRINT } from './BlueprintExtendedV
 import { BlueprintSettingTab } from './BlueprintSettingTab'
 import { BlueprintView } from './BlueprintView'
 import {
+  applyBlueprintToFile,
   createBlueprint,
   createBlueprintInFolder,
   createNoteFromBlueprint,
@@ -24,8 +25,22 @@ const DEFAULT_SETTINGS: Partial<BlueprintPluginSettings> = {
   experimentalHasBlueprintSyntaxHighlight: false,
 }
 
+export interface BlueprintPluginApi {
+  /**
+   * Apply the blueprint linked in the note's `blueprint` frontmatter property,
+   * without requiring the note to be open or active. Resolves once the note
+   * has been updated; rejects if the note has no blueprint, the blueprint
+   * cannot be resolved, or rendering fails.
+   */
+  applyToFile: (file: TFile) => Promise<void>
+}
+
 export default class BlueprintPlugin extends Plugin {
   declare settings: BlueprintPluginSettings
+
+  readonly api: BlueprintPluginApi = {
+    applyToFile: (file) => applyBlueprintToFile(this.app, file),
+  }
 
   async onload() {
     await this.loadSettings()
