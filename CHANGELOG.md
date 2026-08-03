@@ -1,5 +1,11 @@
 ## Changelog
 
+### 0.10.0
+
+- Expose a public scripting API: `plugin.api.applyToFile(file)` applies a note's blueprint headlessly (no open note required) and returns an awaitable promise
+- Abort instead of overwriting when a note's content changes while its blueprint is rendering
+- Expose `EnsureError` on the api object so consumers can distinguish precondition failures from render errors
+
 ### 0.9.0
 
 - Add a `___REST___` pseudo-section for note-owned structure
