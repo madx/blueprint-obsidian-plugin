@@ -17,7 +17,7 @@ await blueprint.api.applyToFile(file) // file: TFile with a `blueprint` frontmat
 
 `applyToFile` resolves once the note has been updated. The note's metadata must already be indexed: if your script just created or modified the note, wait for the metadata cache to reflect the change (e.g. `metadataCache.on('changed', ...)`) before calling.
 
-The promise rejects with `EnsureError` (exported by the plugin module) when a precondition fails — the note has no `blueprint` link, the blueprint cannot be resolved, the note's metadata is not cached, the note changed while the blueprint was rendering, or the plugin is not loaded — and with the underlying template error when rendering fails. (The *Apply blueprint* command is unchanged: it acts on the active note and reports errors via notices.)
+The promise rejects with `EnsureError` (available as `blueprint.api.EnsureError` for `instanceof` checks) when a precondition fails — the note has no `blueprint` link, the blueprint cannot be resolved, the note's metadata is not cached, the note changed while the blueprint was rendering, or the plugin is not loaded — and with the underlying template error when rendering fails. (The *Apply blueprint* command is unchanged: it acts on the active note and reports errors via notices.)
 
 ## Acknowledgements
 

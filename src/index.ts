@@ -44,6 +44,13 @@ export interface BlueprintPluginApi {
    * when rendering fails.
    */
   applyToFile: (file: TFile) => Promise<void>
+
+  /**
+   * The error class used for precondition failures, exposed here so
+   * consumers can branch with `instanceof` (class and export names are
+   * not reachable across plugin bundles).
+   */
+  EnsureError: typeof EnsureError
 }
 
 export default class BlueprintPlugin extends Plugin {
@@ -58,6 +65,7 @@ export default class BlueprintPlugin extends Plugin {
       }
       return applyBlueprintToFile(this.app, file)
     },
+    EnsureError,
   }
 
   async onload() {
