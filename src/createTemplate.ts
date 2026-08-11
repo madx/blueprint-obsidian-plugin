@@ -5,6 +5,7 @@ import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
 import { prefixLines, split, toEmbed } from './filters'
 import { SectionData } from './parseSections'
+import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 
 type CreateTemplate = {
   app: App

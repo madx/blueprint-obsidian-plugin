@@ -4,7 +4,14 @@ import * as path from 'path'
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 import { createTemplate } from './createTemplate'
 import { parseSections } from './parseSections'
-import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
+import {
+  ensure,
+  EnsureError,
+  fileHasBlueprint,
+  findInTree,
+  renderTemplate,
+  safeMerge,
+} from './utils'
 
 async function createBlueprint(app: App) {
   const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
@@ -96,14 +103,7 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
     const noteFrontmatter = metadata?.frontmatter || {}
     const blueprintFrontmatter =
       parseYaml(blueprintFrontmatterInfo.frontmatter) ?? ({} as Record<string, unknown>)
-    const missingFrontmatterEntriesBeforeRendering = Object.fromEntries(
-      Object.entries(blueprintFrontmatter).filter(([key]) => !(key in noteFrontmatter)),
-    )
-    const mergedFrontmatter = Object.assign(
-      {},
-      noteFrontmatter,
-      missingFrontmatterEntriesBeforeRendering,
-    )
+    const beforeRenderingMergedFrontmatter = safeMerge(noteFrontmatter, blueprintFrontmatter)
 
     const frontmatterTemplate = createTemplate({
       app,
@@ -111,20 +111,22 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
       sectionData,
       blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
     })
-    const frontmatterContext = { file, frontmatter: mergedFrontmatter, ...mergedFrontmatter }
+    const frontmatterContext = {
+      file,
+      frontmatter: beforeRenderingMergedFrontmatter,
+      ...beforeRenderingMergedFrontmatter,
+    }
     const renderedBlueprintFrontmatter = await renderTemplate(
       frontmatterTemplate,
       frontmatterContext,
     )
     const parsedRenderedBlueprintFrontmatter =
       parseYaml(renderedBlueprintFrontmatter) ?? ({} as Record<string, unknown>)
-    const missingFrontmatterEntriesAfterRendering = Object.fromEntries(
-      Object.entries(parsedRenderedBlueprintFrontmatter).filter(
-        ([key]) => !(key in noteFrontmatter),
-      ),
+    const afterRenderingMergedFrontmatter = safeMerge(
+      noteFrontmatter,
+      parsedRenderedBlueprintFrontmatter,
     )
-    const frontmatter = Object.assign({}, noteFrontmatter, missingFrontmatterEntriesAfterRendering)
-    const renderedFrontmatter = stringifyYaml(frontmatter).trim()
+    const renderedFrontmatter = stringifyYaml(afterRenderingMergedFrontmatter).trim()
 
     // Render the note's content
     const contentTemplate = createTemplate({
@@ -133,7 +135,11 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
       sectionData,
       blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
     })
-    const contentContext = { file, frontmatter, ...frontmatter }
+    const contentContext = {
+      file,
+      frontmatter: afterRenderingMergedFrontmatter,
+      ...afterRenderingMergedFrontmatter,
+    }
     const renderedContent = await renderTemplate(contentTemplate, contentContext)
 
     // Update note
