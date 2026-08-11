@@ -4,6 +4,7 @@ type Section = {
   level: number
   name: string
   contents: string
+  chunk: string
   header?: string
 }
 
@@ -16,7 +17,7 @@ export const TOP_SECTION_ID = '___TOP___' as const
 export const END_SECTION_ID = '___END___' as const
 
 function parseSections(metadata: CachedMetadata, contents: string): SectionData {
-  const topSection: Section = { level: 0, name: TOP_SECTION_ID, contents: '' }
+  const topSection: Section = { level: 0, name: TOP_SECTION_ID, chunk: '', contents: '' }
   const path: Section[] = []
   const sections: Section[] = [topSection]
   const byRef: Section[] = []
@@ -29,7 +30,7 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
       const markdown = contents
         .slice(previousSectionCache.position.end.offset, sectionCache.position.end.offset)
         .trim()
-      sections.push({ level: 0, name: sectionCache.id, contents: markdown })
+      sections.push({ level: 0, name: sectionCache.id, chunk: markdown, contents: markdown })
       previousSectionCache = sectionCache
       continue
     }
@@ -45,7 +46,7 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
       const level = hashes.length
       const name = headingParts.join('')
 
-      const newSection: Section = { level, name, contents: '', header: markdown }
+      const newSection: Section = { level, name, chunk: '', contents: '', header: markdown }
       const previousSection = path.at(-1)
 
       sections.push(newSection)
@@ -80,10 +81,12 @@ function parseSections(metadata: CachedMetadata, contents: string): SectionData 
     if (path.length === 0) {
       // If we have no previous headings, it means we are still in the top section
       topSection.contents += sectionContents
+      topSection.chunk += sectionContents
     } else {
       for (const parentSection of path) {
         parentSection.contents += sectionContents
       }
+      path.at(-1)!.chunk += sectionContents
     }
     previousSectionCache = sectionCache
   }
