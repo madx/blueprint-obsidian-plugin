@@ -11,6 +11,8 @@ type CreateTemplate = {
   blueprint: string
   filePath: string
   sectionData: SectionData
+  /** Blueprint filename suffix, so `{% extends %}` can resolve a bare name. */
+  suffix: string
 }
 
 function createGetFrontmatter(app: App, filePath: string) {
@@ -29,8 +31,8 @@ function createGetFrontmatter(app: App, filePath: string) {
   }
 }
 
-function createTemplate({ app, blueprint, filePath, sectionData }: CreateTemplate) {
-  const obsidianLoader = new ObsidianLoader(app)
+function createTemplate({ app, blueprint, filePath, sectionData, suffix }: CreateTemplate) {
+  const obsidianLoader = new ObsidianLoader(app, suffix)
   const env = new nunjucks.Environment(obsidianLoader, { autoescape: false })
   env.addExtension('SectionExtension', new SectionExtension(sectionData))
 

@@ -2,23 +2,24 @@ import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFold
 
 import * as path from 'path'
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
+import { blueprintDisplayName } from './constants'
 import { createTemplate } from './createTemplate'
 import { parseSections, toHeadings } from './parseSections'
 import { ensure, EnsureError, fileHasBlueprint, findInTree, renderTemplate } from './utils'
 
-async function createBlueprint(app: App) {
+async function createBlueprint(app: App, suffix: string) {
   const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
   const defaultFolder = app.fileManager.getNewFileParent(currentFilePath)
 
-  await createBlueprintInFolder(app, defaultFolder.path)
+  await createBlueprintInFolder(app, defaultFolder.path, suffix)
 }
 
-async function createBlueprintInFolder(app: App, folderPath: string) {
-  let blueprintName = 'Untitled Blueprint.blueprint'
+async function createBlueprintInFolder(app: App, folderPath: string, suffix: string) {
+  let blueprintName = `Untitled Blueprint${suffix}`
   let counter = 1
 
   while (await app.vault.adapter.exists(path.join(folderPath, blueprintName))) {
-    blueprintName = `Untitled Blueprint ${counter}.blueprint`
+    blueprintName = `Untitled Blueprint ${counter}${suffix}`
     counter++
   }
 
@@ -33,15 +34,15 @@ async function createBlueprintInFolder(app: App, folderPath: string) {
   }
 }
 
-async function createNoteFromBlueprint(app: App) {
+async function createNoteFromBlueprint(app: App, suffix: string) {
   const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
   const defaultFolder = app.fileManager.getNewFileParent(currentFilePath)
 
-  await createNoteFromBlueprintInFolder(app, defaultFolder.path)
+  await createNoteFromBlueprintInFolder(app, defaultFolder.path, suffix)
 }
 
-async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
-  const blueprint = await BlueprintSuggestModal.prompt(app)
+async function createNoteFromBlueprintInFolder(app: App, folderPath: string, suffix: string) {
+  const blueprint = await BlueprintSuggestModal.prompt(app, suffix)
 
   if (!blueprint) {
     return
@@ -71,7 +72,7 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
   }
 }
 
-async function applyBlueprintToFile(app: App, file: TFile) {
+async function applyBlueprintToFile(app: App, file: TFile, suffix: string) {
   const metadata = ensure(
     app.metadataCache.getFileCache(file),
     `No cached metadata for ${file.basename}`,
@@ -108,6 +109,7 @@ async function applyBlueprintToFile(app: App, file: TFile) {
     app,
     filePath,
     sectionData,
+    suffix,
     blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
   })
   const frontmatterContext = { file, frontmatter: mergedFrontmatter, ...mergedFrontmatter }
@@ -130,6 +132,7 @@ async function applyBlueprintToFile(app: App, file: TFile) {
     app,
     filePath,
     sectionData,
+    suffix,
     blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
   })
   // headings exposes the note's own structure to the template, so a blueprint can inspect or
@@ -153,9 +156,9 @@ async function applyBlueprintToFile(app: App, file: TFile) {
   }
 }
 
-async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolean) {
+async function executeFileBlueprint(app: App, file: TFile, suffix: string, shouldNotify?: boolean) {
   try {
-    await applyBlueprintToFile(app, file)
+    await applyBlueprintToFile(app, file, suffix)
 
     if (shouldNotify) {
       new Notice('Applied blueprint')
@@ -170,29 +173,29 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
   }
 }
 
-async function executeFolderBlueprint(app: App, root: TFolder) {
-  const blueprint = await BlueprintSuggestModal.prompt(app)
+async function executeFolderBlueprint(app: App, root: TFolder, suffix: string) {
+  const blueprint = await BlueprintSuggestModal.prompt(app, suffix)
 
   if (!blueprint) {
     return
   }
 
-  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf, blueprint))
+  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf, suffix, blueprint))
 
   if (files.length === 0) {
-    new Notice(`No notes with blueprint ${blueprint.path} found in ${root.path}`)
+    new Notice(`No notes with blueprint ${blueprintDisplayName(blueprint.name, suffix)} found in ${root.path}`)
     return
   }
 
   for (const file of files) {
-    await executeFileBlueprint(app, file)
+    await executeFileBlueprint(app, file, suffix)
   }
 
-  new Notice(`Applied blueprint ${blueprint.path} in ${files.length} notes`)
+  new Notice(`Applied blueprint ${blueprintDisplayName(blueprint.name, suffix)} in ${files.length} notes`)
 }
 
-async function executeFolderBlueprints(app: App, root: TFolder) {
-  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf))
+async function executeFolderBlueprints(app: App, root: TFolder, suffix: string) {
+  const files = findInTree(root, (leaf: TFile) => fileHasBlueprint(app, leaf, suffix))
 
   if (files.length === 0) {
     new Notice(`No notes with blueprints found in ${root.path}`)
@@ -200,15 +203,15 @@ async function executeFolderBlueprints(app: App, root: TFolder) {
   }
 
   for (const file of files) {
-    await executeFileBlueprint(app, file)
+    await executeFileBlueprint(app, file, suffix)
   }
 
   new Notice(`Applied blueprints in ${files.length} notes`)
 }
 
-async function updateBlueprintNotes(app: App, file: TFile) {
+async function updateBlueprintNotes(app: App, file: TFile, suffix: string) {
   const notesUsingBlueprint = Object.entries(app.metadataCache.resolvedLinks)
-    .filter(([_, links]) => file.path in links)
+    .filter(([notePath, links]) => file.path in links && !notePath.endsWith(suffix))
     .map(([key]) => key)
 
   if (notesUsingBlueprint.length === 0) {
@@ -220,7 +223,7 @@ async function updateBlueprintNotes(app: App, file: TFile) {
     const file = app.vault.getFileByPath(notePath)
 
     if (file) {
-      await executeFileBlueprint(app, file)
+      await executeFileBlueprint(app, file, suffix)
     }
   }
 

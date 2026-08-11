@@ -3,8 +3,6 @@ import type { App, TAbstractFile, TFile, TFolder } from 'obsidian'
 
 class EnsureError extends Error {}
 
-const BLUEPRINT_FILE_EXTENSION = 'blueprint' as const
-
 function ensure<T>(value: T, message: string): NonNullable<T> {
   if (!value) {
     throw new EnsureError(message)
@@ -12,11 +10,27 @@ function ensure<T>(value: T, message: string): NonNullable<T> {
   return value
 }
 
-function fileIsBlueprint(file: TFile) {
-  return file.extension === BLUEPRINT_FILE_EXTENSION
+/**
+ * Tests the file **name**, not `file.extension`: the default suffix is
+ * `.blueprint.md`, whose extension is `md`. Works for a non-markdown
+ * `.blueprint` too, since that name also ends with its suffix.
+ */
+function fileIsBlueprint(file: TFile, suffix: string) {
+  return file.name.endsWith(suffix)
 }
 
-function fileHasBlueprint(app: App, file: TFile, blueprint?: TFile) {
+/**
+ * A blueprint is never a note *with* a blueprint, even when it links to one.
+ *
+ * This mattered little while blueprints were non-markdown — nothing indexed them,
+ * so they never turned up in a folder walk or in `resolvedLinks`. As `.md` they are
+ * ordinary notes: a blueprint whose frontmatter template contains a `blueprint:`
+ * line would otherwise be picked up by "update all notes in this folder" and
+ * rendered into itself, destroying the template.
+ */
+function fileHasBlueprint(app: App, file: TFile, suffix: string, blueprint?: TFile) {
+  if (fileIsBlueprint(file, suffix)) return false
+
   const metadata = app.metadataCache.getFileCache(file)
   const propPath = metadata?.frontmatterLinks?.find((link) => link.key === 'blueprint')
 

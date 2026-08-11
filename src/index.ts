@@ -14,15 +14,18 @@ import {
   executeFolderBlueprints,
   updateBlueprintNotes,
 } from './commands'
-import { BLUEPRINT_FILE_EXTENSION } from './constants'
+import { DEFAULT_BLUEPRINT_SUFFIX, extensionToRegister, normalizeSuffix } from './constants'
 import { EnsureError, fileHasBlueprint, fileIsBlueprint } from './utils'
 
 interface BlueprintPluginSettings {
   experimentalHasBlueprintSyntaxHighlight: boolean
+  /** Filename suffix marking a blueprint, e.g. `.blueprint.md` or `.blueprint`. */
+  blueprintSuffix: string
 }
 
 const DEFAULT_SETTINGS: Partial<BlueprintPluginSettings> = {
   experimentalHasBlueprintSyntaxHighlight: false,
+  blueprintSuffix: DEFAULT_BLUEPRINT_SUFFIX,
 }
 
 export { EnsureError } from './utils'
@@ -63,9 +66,14 @@ export default class BlueprintPlugin extends Plugin {
       if (!this.isReady) {
         throw new EnsureError('Blueprint plugin is not loaded')
       }
-      return applyBlueprintToFile(this.app, file)
+      return applyBlueprintToFile(this.app, file, this.suffix)
     },
     EnsureError,
+  }
+
+  /** The configured suffix, always usable — a broken setting falls back. */
+  get suffix(): string {
+    return normalizeSuffix(this.settings?.blueprintSuffix)
   }
 
   async onload() {
@@ -86,36 +94,36 @@ export default class BlueprintPlugin extends Plugin {
             subMenu.addItem((item) => {
               item
                 .setTitle('New blueprint')
-                .onClick(async () => createBlueprintInFolder(this.app, file.path))
+                .onClick(async () => createBlueprintInFolder(this.app, file.path, this.suffix))
             })
             subMenu.addItem((item) => {
               item
                 .setTitle('New note from blueprint')
-                .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path))
+                .onClick(async () => createNoteFromBlueprintInFolder(this.app, file.path, this.suffix))
             })
             subMenu.addItem((item) => {
               item
                 .setTitle('Update all notes with blueprints')
-                .onClick(async () => executeFolderBlueprints(this.app, file))
+                .onClick(async () => executeFolderBlueprints(this.app, file, this.suffix))
             })
             subMenu.addItem((item) => {
               item
                 .setTitle('Update all notes using specific blueprint')
-                .onClick(async () => executeFolderBlueprint(this.app, file))
+                .onClick(async () => executeFolderBlueprint(this.app, file, this.suffix))
             })
           }
-          if (file instanceof TFile && fileHasBlueprint(this.app, file)) {
+          if (file instanceof TFile && fileHasBlueprint(this.app, file, this.suffix)) {
             subMenu.addItem((item) => {
               item
                 .setTitle('Apply blueprint')
-                .onClick(async () => executeFileBlueprint(this.app, file, true))
+                .onClick(async () => executeFileBlueprint(this.app, file, this.suffix, true))
             })
           }
-          if (file instanceof TFile && fileIsBlueprint(file)) {
+          if (file instanceof TFile && fileIsBlueprint(file, this.suffix)) {
             subMenu.addItem((item) => {
               item
                 .setTitle('Update notes using this blueprint')
-                .onClick(async () => updateBlueprintNotes(this.app, file))
+                .onClick(async () => updateBlueprintNotes(this.app, file, this.suffix))
             })
           }
         })
@@ -128,9 +136,9 @@ export default class BlueprintPlugin extends Plugin {
       checkCallback: (checking: boolean) => {
         const file = this.app.workspace.getActiveFile()
 
-        if (file && fileHasBlueprint(this.app, file)) {
+        if (file && fileHasBlueprint(this.app, file, this.suffix)) {
           if (!checking) {
-            void executeFileBlueprint(this.app, file, true)
+            void executeFileBlueprint(this.app, file, this.suffix, true)
           }
           return true
         }
@@ -144,7 +152,7 @@ export default class BlueprintPlugin extends Plugin {
       name: 'Apply blueprints in all notes in vault',
       callback: async () => {
         const root = this.app.vault.getRoot()
-        await executeFolderBlueprints(this.app, root)
+        await executeFolderBlueprints(this.app, root, this.suffix)
       },
     })
 
@@ -152,7 +160,7 @@ export default class BlueprintPlugin extends Plugin {
       id: 'create-blueprint',
       name: 'Create new blueprint',
       callback: () => {
-        void createBlueprint(this.app)
+        void createBlueprint(this.app, this.suffix)
       },
     })
 
@@ -160,7 +168,7 @@ export default class BlueprintPlugin extends Plugin {
       id: 'create-note-from-blueprint',
       name: 'Create new note from blueprint',
       callback: () => {
-        void createNoteFromBlueprint(this.app)
+        void createNoteFromBlueprint(this.app, this.suffix)
       },
     })
 
@@ -170,9 +178,9 @@ export default class BlueprintPlugin extends Plugin {
       checkCallback: (checking: boolean) => {
         const file = this.app.workspace.getActiveFile()
 
-        if (file && fileIsBlueprint(file)) {
+        if (file && fileIsBlueprint(file, this.suffix)) {
           if (!checking) {
-            void updateBlueprintNotes(this.app, file)
+            void updateBlueprintNotes(this.app, file, this.suffix)
           }
           return true
         }
@@ -200,12 +208,19 @@ export default class BlueprintPlugin extends Plugin {
       },
     })
 
-    this.registerExtensions([BLUEPRINT_FILE_EXTENSION], VIEW_TYPE_BLUEPRINT)
-    this.registerView(VIEW_TYPE_BLUEPRINT, (leaf) =>
-      this.settings.experimentalHasBlueprintSyntaxHighlight
-        ? new BlueprintExtendedView(leaf)
-        : new BlueprintView(leaf),
-    )
+    // A `*.blueprint.md` is markdown and Obsidian already opens it; claiming `md`
+    // here would hijack every note in the vault. Only a non-markdown suffix — the
+    // legacy `.blueprint` — needs its own registered view.
+    const extension = extensionToRegister(this.suffix)
+
+    if (extension) {
+      this.registerExtensions([extension], VIEW_TYPE_BLUEPRINT)
+      this.registerView(VIEW_TYPE_BLUEPRINT, (leaf) =>
+        this.settings.experimentalHasBlueprintSyntaxHighlight
+          ? new BlueprintExtendedView(leaf)
+          : new BlueprintView(leaf),
+      )
+    }
 
     this.isReady = true
   }
