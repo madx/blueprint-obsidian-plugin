@@ -56,4 +56,35 @@ async function renderTemplate(template: Template, context: Record<string, unknow
   })
 }
 
-export { ensure, EnsureError, fileHasBlueprint, fileIsBlueprint, findInTree, renderTemplate }
+function safeMerge(
+  left: Record<string, unknown>,
+  right: Record<string, unknown>,
+): Record<string, unknown> {
+  const missingFromLeft = Object.fromEntries(
+    Object.entries(right).filter(([key]) => !(key in left)),
+  )
+
+  const mergedLeft = Object.fromEntries(
+    Object.entries(left).map(([key, value]) => {
+      if (typeof left[key] === 'object' && typeof right[key] === 'object') {
+        return [
+          key,
+          safeMerge(left[key] as Record<string, unknown>, right[key] as Record<string, unknown>),
+        ]
+      }
+      return [key, value]
+    }),
+  )
+
+  return Object.assign({}, mergedLeft, missingFromLeft)
+}
+
+export {
+  ensure,
+  EnsureError,
+  fileHasBlueprint,
+  fileIsBlueprint,
+  findInTree,
+  renderTemplate,
+  safeMerge,
+}
