@@ -60,19 +60,29 @@ function safeMerge(
   left: Record<string, unknown>,
   right: Record<string, unknown>,
 ): Record<string, unknown> {
+  if (left === null || right === null) {
+    return left ?? right
+  }
+
   const missingFromLeft = Object.fromEntries(
     Object.entries(right).filter(([key]) => !(key in left)),
   )
 
   const mergedLeft = Object.fromEntries(
-    Object.entries(left).map(([key, value]) => {
-      if (typeof left[key] === 'object' && typeof right[key] === 'object') {
+    Object.entries(left).map(([key, leftValue]) => {
+      const rightValue = right[key]
+
+      if (typeof leftValue === 'object' && typeof rightValue === 'object') {
+        if (Array.isArray(leftValue) && Array.isArray(rightValue)) {
+          return [key, [...new Set([...leftValue, ...rightValue])]]
+        }
         return [
           key,
-          safeMerge(left[key] as Record<string, unknown>, right[key] as Record<string, unknown>),
+          safeMerge(leftValue as Record<string, unknown>, rightValue as Record<string, unknown>),
         ]
       }
-      return [key, value]
+
+      return [key, leftValue]
     }),
   )
 
