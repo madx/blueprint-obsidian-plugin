@@ -1,6 +1,6 @@
 import { App, FuzzySuggestModal, TFile } from 'obsidian'
-import * as path from 'path'
 import { BLUEPRINT_FILE_EXTENSION } from './constants'
+import { joinPath } from './utils'
 
 type MaybeBlueprint = TFile | null
 
@@ -26,7 +26,7 @@ class BlueprintSuggestModal extends FuzzySuggestModal<TFile> {
 
   getItemText(blueprint: TFile): string {
     return blueprint.parent?.parent // checks wether parent is not root folder
-      ? path.join(blueprint.parent.path, blueprint.basename)
+      ? joinPath(blueprint.parent.path, blueprint.basename)
       : blueprint.basename
   }
 

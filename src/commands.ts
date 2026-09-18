@@ -1,6 +1,5 @@
 import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFolder } from 'obsidian'
 
-import * as path from 'path'
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 import { createTemplate } from './createTemplate'
 import { parseSections } from './parseSections'
@@ -9,6 +8,7 @@ import {
   EnsureError,
   fileHasBlueprint,
   findInTree,
+  joinPath,
   renderTemplate,
   safeMerge,
 } from './utils'
@@ -24,12 +24,12 @@ async function createBlueprintInFolder(app: App, folderPath: string) {
   let blueprintName = 'Untitled Blueprint.blueprint'
   let counter = 1
 
-  while (await app.vault.adapter.exists(path.join(folderPath, blueprintName))) {
+  while (await app.vault.adapter.exists(joinPath(folderPath, blueprintName))) {
     blueprintName = `Untitled Blueprint ${counter}.blueprint`
     counter++
   }
 
-  const createdBlueprint = await app.vault.create(path.join(folderPath, blueprintName), '')
+  const createdBlueprint = await app.vault.create(joinPath(folderPath, blueprintName), '')
 
   const mostRecentLeaf = app.workspace.getMostRecentLeaf()
 
@@ -57,14 +57,14 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
   let noteName = 'Untitled.md'
   let counter = 1
 
-  while (await app.vault.adapter.exists(path.join(folderPath, noteName))) {
+  while (await app.vault.adapter.exists(joinPath(folderPath, noteName))) {
     noteName = `Untitled ${counter}.md`
     counter++
   }
 
   const blueprintLink = app.fileManager.generateMarkdownLink(blueprint, folderPath)
   const content = ['---', `blueprint: "${blueprintLink}"`, '---'].join('\n')
-  const createdNote = await app.vault.create(path.join(folderPath, noteName), content)
+  const createdNote = await app.vault.create(joinPath(folderPath, noteName), content)
 
   const mostRecentLeaf = app.workspace.getMostRecentLeaf()
 

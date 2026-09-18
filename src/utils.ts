@@ -44,6 +44,10 @@ function isFolder(leaf: TAbstractFile): leaf is TFolder {
   return 'children' in leaf
 }
 
+function joinPath(folderPath: string, filePath: string) {
+  return folderPath.endsWith('/') ? folderPath + filePath : `${folderPath}/${filePath}`
+}
+
 async function renderTemplate(template: Template, context: Record<string, unknown>) {
   return new Promise<string>((resolve, reject) => {
     template.render(context, (err: unknown, result: string | null) => {
@@ -95,6 +99,7 @@ export {
   fileHasBlueprint,
   fileIsBlueprint,
   findInTree,
+  joinPath,
   renderTemplate,
   safeMerge,
 }
