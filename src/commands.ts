@@ -1,4 +1,13 @@
-import { App, getFrontMatterInfo, Notice, parseYaml, stringifyYaml, TFile, TFolder } from 'obsidian'
+import {
+  App,
+  getFrontMatterInfo,
+  Notice,
+  parseYaml,
+  Platform,
+  stringifyYaml,
+  TFile,
+  TFolder,
+} from 'obsidian'
 
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
 import { createTemplate } from './createTemplate'
@@ -12,6 +21,21 @@ import {
   renderTemplate,
   safeMerge,
 } from './utils'
+
+async function newFile(app: App, path: string, content: string = '') {
+  const createdFile = await app.vault.create(path, content)
+
+  const mostRecentLeaf = app.workspace.getMostRecentLeaf()
+
+  if (mostRecentLeaf) {
+    await mostRecentLeaf.openFile(createdFile)
+    await app.workspace.revealLeaf(mostRecentLeaf)
+    if (Platform.isMobile) {
+      app.workspace.leftSplit.collapse()
+    }
+    mostRecentLeaf.setEphemeralState({ rename: 'all' })
+  }
+}
 
 async function createBlueprint(app: App) {
   const currentFilePath = app.workspace.getActiveFile()?.path ?? ''
@@ -29,15 +53,7 @@ async function createBlueprintInFolder(app: App, folderPath: string) {
     counter++
   }
 
-  const createdBlueprint = await app.vault.create(joinPath(folderPath, blueprintName), '')
-
-  const mostRecentLeaf = app.workspace.getMostRecentLeaf()
-
-  if (mostRecentLeaf) {
-    await mostRecentLeaf.openFile(createdBlueprint)
-    await app.workspace.revealLeaf(mostRecentLeaf)
-    mostRecentLeaf.setEphemeralState({ rename: 'all' })
-  }
+  await newFile(app, joinPath(folderPath, blueprintName))
 }
 
 async function createNoteFromBlueprint(app: App) {
@@ -64,18 +80,8 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
 
   const blueprintLink = app.fileManager.generateMarkdownLink(blueprint, folderPath)
   const content = ['---', `blueprint: "${blueprintLink}"`, '---'].join('\n')
-  const createdNote = await app.vault.create(joinPath(folderPath, noteName), content)
 
-  const mostRecentLeaf = app.workspace.getMostRecentLeaf()
-
-  if (mostRecentLeaf) {
-    await mostRecentLeaf.openFile(createdNote)
-    await app.workspace.revealLeaf(mostRecentLeaf)
-
-    mostRecentLeaf.setEphemeralState({
-      rename: 'all',
-    })
-  }
+  await newFile(app, joinPath(folderPath, noteName), content)
 }
 
 async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolean) {
