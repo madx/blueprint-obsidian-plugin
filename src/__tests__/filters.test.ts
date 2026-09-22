@@ -1,5 +1,7 @@
 import { assert, describe, test } from 'vitest'
-import { prefixLines, toEmbed } from '../filters'
+import { filters } from '../filters'
+
+const { prefixLines, embed } = filters
 
 describe('prefixLines', async () => {
   test('adds the prefix to an empty string', () => {
@@ -18,28 +20,28 @@ describe('prefixLines', async () => {
   })
 })
 
-describe('toEmbed', async () => {
+describe('embed', async () => {
   test('returns an empty string when link is empty', () => {
-    assert.isEmpty(toEmbed(''))
+    assert.isEmpty(embed(''))
   })
 
   test('returns an embed for WikiLinks', () => {
     const expected = '![[link]]'
-    assert.equal(toEmbed('[[link]]'), expected)
+    assert.equal(embed('[[link]]'), expected)
   })
 
   test('returns an embed with display text for WikiLinks', () => {
     const expected = '![[link|display]]'
-    assert.equal(toEmbed('[[link]]', 'display'), expected)
+    assert.equal(embed('[[link]]', 'display'), expected)
   })
 
   test('returns an embed for URLs', () => {
     const expected = '![](https://example.com)'
-    assert.equal(toEmbed('https://example.com'), expected)
+    assert.equal(embed('https://example.com'), expected)
   })
 
   test('returns an embed with display text for URLs', () => {
     const expected = '![](https://example.com)'
-    assert.equal(toEmbed('https://example.com'), expected)
+    assert.equal(embed('https://example.com'), expected)
   })
 })

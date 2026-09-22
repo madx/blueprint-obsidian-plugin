@@ -44,6 +44,10 @@ function isFolder(leaf: TAbstractFile): leaf is TFolder {
   return 'children' in leaf
 }
 
+function isWikiLink(string: string) {
+  return string.startsWith('[[') && string.endsWith(']]')
+}
+
 function joinPath(folderPath: string, filePath: string) {
   return folderPath.endsWith('/') ? folderPath + filePath : `${folderPath}/${filePath}`
 }
@@ -93,13 +97,19 @@ function safeMerge(
   return Object.assign({}, mergedLeft, missingFromLeft)
 }
 
+function unwikilink(wikilink: string) {
+  return wikilink.slice(2, -2).split('|').at(0) ?? ''
+}
+
 export {
   ensure,
   EnsureError,
   fileHasBlueprint,
   fileIsBlueprint,
   findInTree,
+  isWikiLink,
   joinPath,
   renderTemplate,
   safeMerge,
+  unwikilink,
 }

@@ -3,8 +3,9 @@ import * as nunjucks from 'nunjucks'
 import { App, moment } from 'obsidian'
 import { ObsidianLoader } from './ObsidianLoader'
 import { SectionExtension } from './SectionExtension'
-import { debug, prefixLines, split, toEmbed } from './filters'
+import { filters } from './filters'
 import { SectionData } from './parseSections'
+import { isWikiLink, unwikilink } from './utils'
 
 type CreateTemplate = {
   app: App
@@ -42,10 +43,9 @@ function createTemplate({ app, blueprint, filePath, sectionData }: CreateTemplat
   env.addGlobal('moment', moment)
   env.addGlobal('resolve', createResolve(app))
 
-  env.addFilter('prefix_lines', prefixLines)
-  env.addFilter('split', split)
-  env.addFilter('to_embed', toEmbed)
-  env.addFilter('debug', debug)
+  for (const [filterName, filterFunc] of Object.entries(filters)) {
+    env.addFilter(filterName, filterFunc)
+  }
 
   return new nunjucks.Template(blueprint, env, filePath)
 }

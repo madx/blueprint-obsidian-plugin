@@ -1,4 +1,5 @@
-const TO_EMBED_URL_REGEX = /^https?:\/\//
+import { link } from 'node:fs'
+import { isWikiLink, unwikilink } from './utils'
 
 function debug(value: unknown) {
   console.log(value)
@@ -16,16 +17,28 @@ function split(string: string, separator: string) {
   return string.split(separator)
 }
 
-function toEmbed(link: string, display?: string) {
-  if (link.length === 0) {
-    return link
+function embed(linkable: string, display?: string) {
+  if (linkable.trim().length === 0) {
+    return ''
   }
 
-  return TO_EMBED_URL_REGEX.test(link)
-    ? `![${display ?? ''}](${link})`
-    : display
-      ? `!${link.replace(/\]\]$/, `|${display}]]`)}`
-      : `!${link}`
+  if (isWikiLink(linkable)) {
+    const path = unwikilink(linkable)
+
+    return '!' + wikilink(path, display)
+  } else {
+    return `![${display ?? ''}](${linkable})`
+  }
 }
 
-export { debug, prefixLines, split, toEmbed }
+function wikilink(linkable: string, alias?: string) {
+  const path = isWikiLink(linkable) ? unwikilink(linkable) : linkable
+
+  return alias ? `[[${path}|${alias}]]` : `[[${path}]]`
+}
+
+function heading_link(linkable: string, heading: string, alias?: string) {
+  return wikilink(`${unwikilink(linkable)}#${heading}`, alias)
+}
+
+export const filters = { debug, embed, heading_link, prefixLines, split, wikilink, unwikilink }
