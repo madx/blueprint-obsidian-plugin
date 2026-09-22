@@ -13,19 +13,24 @@ type CreateTemplate = {
   sectionData: SectionData
 }
 
-function createGetFrontmatter(app: App, filePath: string) {
-  return (targetPath: string) => {
-    const cleanTargetPath = targetPath.startsWith('[[')
-      ? targetPath.slice(2, targetPath.length - 2)
-      : targetPath
+function createResolve(app: App) {
+  return (filePath: string) => {
+    const cleanFilePath = filePath.startsWith('[[') ? filePath.slice(2, -2) : filePath
 
-    const target = app.metadataCache.getFirstLinkpathDest(cleanTargetPath, filePath)
+    const file = app.metadataCache.getFirstLinkpathDest(cleanFilePath, filePath)
 
-    if (!target) {
-      throw new Error(`Unable to resolve ${targetPath}`)
+    if (!file) {
+      throw new Error(`Unable to resolve ${filePath}`)
     }
 
-    return app.metadataCache.getFileCache(target)?.frontmatter ?? {}
+    const fileCache = app.metadataCache.getFileCache(file)
+    const frontmatter = fileCache?.frontmatter ?? {}
+
+    return {
+      file,
+      frontmatter,
+      ...frontmatter,
+    }
   }
 }
 
@@ -35,7 +40,7 @@ function createTemplate({ app, blueprint, filePath, sectionData }: CreateTemplat
   env.addExtension('SectionExtension', new SectionExtension(sectionData))
 
   env.addGlobal('moment', moment)
-  env.addGlobal('get_frontmatter', createGetFrontmatter(app, filePath))
+  env.addGlobal('resolve', createResolve(app))
 
   env.addFilter('prefix_lines', prefixLines)
   env.addFilter('split', split)
