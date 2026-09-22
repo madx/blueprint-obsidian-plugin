@@ -16,15 +16,20 @@ type CreateTemplate = {
 
 function createResolve(app: App) {
   return (filePath: string) => {
-    const cleanFilePath = filePath.startsWith('[[') ? filePath.slice(2, -2) : filePath
+    const cleanFilePath = isWikiLink(filePath) ? unwikilink(filePath) : filePath
 
     const file = app.metadataCache.getFirstLinkpathDest(cleanFilePath, filePath)
 
     if (!file) {
-      throw new Error(`Unable to resolve ${filePath}`)
+      return null
     }
 
     const fileCache = app.metadataCache.getFileCache(file)
+
+    if (!fileCache) {
+      return null
+    }
+
     const frontmatter = fileCache?.frontmatter ?? {}
 
     return {
