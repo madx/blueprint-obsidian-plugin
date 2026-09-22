@@ -1,5 +1,10 @@
 const TO_EMBED_URL_REGEX = /^https?:\/\//
 
+function debug(value: unknown) {
+  console.log(value)
+  return JSON.stringify(value, null, 2)
+}
+
 function prefixLines(string: string, prefix: string) {
   return string
     .split(/\n/)
@@ -23,4 +28,4 @@ function toEmbed(link: string, display?: string) {
       : `!${link}`
 }
 
-export { prefixLines, split, toEmbed }
+export { debug, prefixLines, split, toEmbed }
