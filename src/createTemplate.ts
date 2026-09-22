@@ -6,6 +6,11 @@ import { SectionExtension } from './SectionExtension'
 import { filters } from './filters'
 import { SectionData } from './parseSections'
 import { isWikiLink, unwikilink } from './utils'
+import {
+  standardFilters as knapFilters,
+  TemplateFilter as KnapTemplateFilter,
+  standardFilters,
+} from 'knap'
 
 type CreateTemplate = {
   app: App
@@ -52,7 +57,20 @@ function createTemplate({ app, blueprint, filePath, sectionData }: CreateTemplat
     env.addFilter(filterName, filterFunc)
   }
 
+  for (const [filterName, filterFunc] of Object.entries(knapFilters)) {
+    env.addFilter(`knap.${filterName}`, wrapKnapFilter(filterFunc))
+  }
+
   return new nunjucks.Template(blueprint, env, filePath)
+}
+
+function wrapKnapFilter(filterFunc: KnapTemplateFilter) {
+  return (input: any, param?: string) => {
+    if (typeof input === 'string') {
+      return filterFunc(input, param)
+    }
+    return filterFunc(JSON.stringify(input), param)
+  }
 }
 
 export { createTemplate }
