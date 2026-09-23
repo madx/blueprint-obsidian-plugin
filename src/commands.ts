@@ -21,6 +21,7 @@ import {
   renderTemplate,
   safeMerge,
 } from './utils'
+import { validateOptions } from './options'
 
 async function newFile(app: App, path: string, content: string = '') {
   const createdFile = await app.vault.create(path, content)
@@ -126,12 +127,24 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
       frontmatterTemplate,
       frontmatterContext,
     )
-    const parsedRenderedBlueprintFrontmatter =
-      parseYaml(renderedBlueprintFrontmatter) ?? ({} as Record<string, unknown>)
+    const parsedRenderedBlueprintFrontmatter = (parseYaml(renderedBlueprintFrontmatter) ??
+      {}) as Record<string, unknown>
+
+    const blueprintOptions = parsedRenderedBlueprintFrontmatter.blueprint ?? {}
+    const areOptionsValid = validateOptions(blueprintOptions)
+
+    if (!validateOptions(blueprintOptions)) {
+      ensure(areOptionsValid, `Invalid options for ${file.basename}`)
+      return
+    }
+
+    delete parsedRenderedBlueprintFrontmatter.blueprint
+
     const afterRenderingMergedFrontmatter = safeMerge(
       noteFrontmatter,
       parsedRenderedBlueprintFrontmatter,
     )
+
     const renderedFrontmatter = stringifyYaml(afterRenderingMergedFrontmatter).trim()
 
     // Render the note's content
@@ -152,13 +165,17 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
     const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
     await app.vault.process(file, () => output)
 
+    if (blueprintOptions.folder) {
+      await app.vault.rename(file, `${blueprintOptions.folder}/${file.name}`)
+    }
+
     if (shouldNotify) {
       new Notice('Applied blueprint')
     }
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
-    } else if (error instanceof Error && error.name.startsWith('Template render error')) {
+    } else {
       new Notice(`${error.name}\n${error.message}`)
     }
     console.error(error)
