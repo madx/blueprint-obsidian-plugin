@@ -6,11 +6,7 @@ import { SectionExtension } from './SectionExtension'
 import { filters } from './filters'
 import { SectionData } from './parseSections'
 import { isWikiLink, unwikilink } from './utils'
-import {
-  standardFilters as knapFilters,
-  TemplateFilter as KnapTemplateFilter,
-  standardFilters,
-} from 'knap'
+import { standardFilters as knapFilters, TemplateFilter as KnapTemplateFilter } from 'knap'
 
 type CreateTemplate = {
   app: App
