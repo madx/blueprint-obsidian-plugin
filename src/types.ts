@@ -1,5 +1,4 @@
-type BlueprintOptions = {
-  folder?: string
-}
+import { TFile } from 'obsidian'
 
-export type { BlueprintOptions }
+export type ErrorMessage = string
+export type TFileLike = Pick<TFile, 'path'>

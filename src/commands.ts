@@ -1,27 +1,10 @@
-import {
-  App,
-  getFrontMatterInfo,
-  Notice,
-  parseYaml,
-  Platform,
-  stringifyYaml,
-  TFile,
-  TFolder,
-} from 'obsidian'
+import { App, Notice, Platform, TFile, TFolder } from 'obsidian'
 
 import { BlueprintSuggestModal } from './BlueprintSuggestModal'
-import { createTemplate } from './createTemplate'
-import { parseSections } from './parseSections'
-import {
-  ensure,
-  EnsureError,
-  fileHasBlueprint,
-  findInTree,
-  joinPath,
-  renderTemplate,
-  safeMerge,
-} from './utils'
-import { validateOptions } from './options'
+import { ensure, EnsureError, fileHasBlueprint, findInTree, joinPath } from './utils'
+import { applyBlueprint, readBlueprint } from './blueprint'
+import { readTargetFile } from './targetFile'
+import { createRenderer, createResolver } from './renderer'
 
 async function newFile(app: App, path: string, content: string = '') {
   const createdFile = await app.vault.create(path, content)
@@ -87,86 +70,43 @@ async function createNoteFromBlueprintInFolder(app: App, folderPath: string) {
 
 async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolean) {
   try {
-    const metadata = ensure(
+    const targetFileMetadata = ensure(
       app.metadataCache.getFileCache(file),
       `No cached metadata for ${file.basename}`,
     )
     const blueprintPropertyPath = ensure(
-      metadata.frontmatterLinks?.find((link) => link.key === 'blueprint'),
+      targetFileMetadata.frontmatterLinks?.find((link) => link.key === 'blueprint'),
       'File has no blueprint',
     )
-    const blueprintFilePath = ensure(
+    const blueprintFile = ensure(
       app.metadataCache.getFirstLinkpathDest(blueprintPropertyPath?.link, file.path),
       'Cannot find linked blueprint',
     )
 
-    const blueprint = await app.vault.cachedRead(blueprintFilePath)
-    const fileContent = await app.vault.read(file)
-    const filePath = file.path
-    const sectionData = parseSections(metadata, fileContent)
+    const blueprintSource = await app.vault.cachedRead(blueprintFile)
+    const targetFileSource = await app.vault.read(file)
+    const targetFileResult = readTargetFile(file, targetFileSource, targetFileMetadata)
+    const blueprintResult = readBlueprint(blueprintSource)
 
-    // Render blueprint's frontmatter then merge it with the note's frontmatter
-    const blueprintFrontmatterInfo = getFrontMatterInfo(blueprint)
-    const noteFrontmatter = metadata?.frontmatter || {}
-    const blueprintFrontmatter =
-      parseYaml(blueprintFrontmatterInfo.frontmatter) ?? ({} as Record<string, unknown>)
-    const beforeRenderingMergedFrontmatter = safeMerge(noteFrontmatter, blueprintFrontmatter)
-
-    const frontmatterTemplate = createTemplate({
-      app,
-      filePath,
-      sectionData,
-      blueprint: blueprint.slice(blueprintFrontmatterInfo.from, blueprintFrontmatterInfo.to),
-    })
-    const frontmatterContext = {
-      file,
-      frontmatter: beforeRenderingMergedFrontmatter,
-      ...beforeRenderingMergedFrontmatter,
-    }
-    const renderedBlueprintFrontmatter = await renderTemplate(
-      frontmatterTemplate,
-      frontmatterContext,
-    )
-    const parsedRenderedBlueprintFrontmatter = (parseYaml(renderedBlueprintFrontmatter) ??
-      {}) as Record<string, unknown>
-
-    const blueprintOptions = parsedRenderedBlueprintFrontmatter.blueprint ?? {}
-    const areOptionsValid = validateOptions(blueprintOptions)
-
-    if (!validateOptions(blueprintOptions)) {
-      ensure(areOptionsValid, `Invalid options for ${file.basename}`)
-      return
+    if (targetFileResult.isError()) {
+      throw targetFileResult.getError()
     }
 
-    delete parsedRenderedBlueprintFrontmatter.blueprint
-
-    const afterRenderingMergedFrontmatter = safeMerge(
-      noteFrontmatter,
-      parsedRenderedBlueprintFrontmatter,
-    )
-
-    const renderedFrontmatter = stringifyYaml(afterRenderingMergedFrontmatter).trim()
-
-    // Render the note's content
-    const contentTemplate = createTemplate({
-      app,
-      filePath,
-      sectionData,
-      blueprint: blueprint.slice(blueprintFrontmatterInfo.contentStart),
-    })
-    const contentContext = {
-      file,
-      frontmatter: afterRenderingMergedFrontmatter,
-      ...afterRenderingMergedFrontmatter,
+    if (blueprintResult.isError()) {
+      throw blueprintResult.getError()
     }
-    const renderedContent = await renderTemplate(contentTemplate, contentContext)
 
-    // Update note
-    const output = ['---', renderedFrontmatter, '---', renderedContent].join('\n')
+    const blueprint = blueprintResult.get()
+    const targetFile = targetFileResult.get()
+    const resolver = createResolver(app)
+    const renderer = createRenderer(resolver, targetFile)
+
+    const output = await applyBlueprint(blueprint, targetFile, renderer)
+
     await app.vault.process(file, () => output)
 
-    if (blueprintOptions.folder) {
-      await app.vault.rename(file, `${blueprintOptions.folder}/${file.name}`)
+    if (blueprint.options.folder) {
+      await app.vault.rename(file, `${blueprint.options.folder}/${file.name}`)
     }
 
     if (shouldNotify) {
@@ -175,7 +115,7 @@ async function executeFileBlueprint(app: App, file: TFile, shouldNotify?: boolea
   } catch (error) {
     if (error instanceof EnsureError) {
       new Notice(error.message)
-    } else {
+    } else if (error instanceof Error) {
       new Notice(`${error.name}\n${error.message}`)
     }
     console.error(error)
