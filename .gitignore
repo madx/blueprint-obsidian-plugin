@@ -23,3 +23,6 @@ data.json
 
 # NVM
 .nvmrc
+
+# Coverage files
+coverage/

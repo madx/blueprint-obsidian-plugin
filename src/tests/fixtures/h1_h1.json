@@ -1,0 +1,112 @@
+{
+  "file": {
+    "path": "h1_h1.md"
+  },
+  "source": "---\nblueprint: \"[[Blueprint.blueprint]]\"\n---\n# H1_1\n# H1_2",
+  "metadata": {
+    "headings": [
+      {
+        "position": {
+          "start": {
+            "line": 3,
+            "col": 0,
+            "offset": 45
+          },
+          "end": {
+            "line": 3,
+            "col": 6,
+            "offset": 51
+          }
+        },
+        "heading": "H1_1",
+        "level": 1
+      },
+      {
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 52
+          },
+          "end": {
+            "line": 4,
+            "col": 6,
+            "offset": 58
+          }
+        },
+        "heading": "H1_2",
+        "level": 1
+      }
+    ],
+    "sections": [
+      {
+        "type": "yaml",
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 2,
+            "col": 3,
+            "offset": 44
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 3,
+            "col": 0,
+            "offset": 45
+          },
+          "end": {
+            "line": 3,
+            "col": 6,
+            "offset": 51
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 52
+          },
+          "end": {
+            "line": 4,
+            "col": 6,
+            "offset": 58
+          }
+        }
+      }
+    ],
+    "frontmatter": {
+      "blueprint": "[[Blueprint.blueprint]]"
+    },
+    "frontmatterPosition": {
+      "start": {
+        "line": 0,
+        "col": 0,
+        "offset": 0
+      },
+      "end": {
+        "line": 2,
+        "col": 3,
+        "offset": 44
+      }
+    },
+    "frontmatterLinks": [
+      {
+        "key": "blueprint",
+        "link": "Blueprint.blueprint",
+        "original": "[[Blueprint.blueprint]]",
+        "displayText": "Blueprint.blueprint"
+      }
+    ]
+  }
+}

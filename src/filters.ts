@@ -1,5 +1,23 @@
-const TO_EMBED_URL_REGEX = /^https?:\/\//
+import { isWikiLink, unwikilink } from './utils'
 
+function debug(value: unknown) {
+  console.log(value)
+  return JSON.stringify(value, null, 2)
+}
+
+function embed(linkable: string, display?: string) {
+  if (linkable.trim().length === 0) {
+    return ''
+  }
+
+  if (isWikiLink(linkable)) {
+    const path = unwikilink(linkable)
+
+    return '!' + wikilink(path, display)
+  } else {
+    return `![${display ?? ''}](${linkable})`
+  }
+}
 function prefixLines(string: string, prefix: string) {
   return string
     .split(/\n/)
@@ -11,16 +29,14 @@ function split(string: string, separator: string) {
   return string.split(separator)
 }
 
-function toEmbed(link: string, display?: string) {
-  if (link.length === 0) {
-    return link
-  }
+function wikilink(linkable: string, alias?: string) {
+  const path = isWikiLink(linkable) ? unwikilink(linkable) : linkable
 
-  return TO_EMBED_URL_REGEX.test(link)
-    ? `![${display ?? ''}](${link})`
-    : display
-      ? `!${link.replace(/\]\]$/, `|${display}]]`)}`
-      : `!${link}`
+  return alias ? `[[${path}|${alias}]]` : `[[${path}]]`
 }
 
-export { prefixLines, split, toEmbed }
+function heading_link(linkable: string, heading: string, newAlias?: string) {
+  return wikilink(`${unwikilink(linkable)}#${heading}`, newAlias)
+}
+
+export const filters = { debug, embed, heading_link, prefixLines, split, wikilink, unwikilink }

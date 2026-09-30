@@ -1,16 +1,18 @@
 import * as nunjucks from 'nunjucks'
-import { END_SECTION_ID, SectionData } from './parseSections'
+import { TargetFile } from './targetFile'
+import { END_SECTION_ID, parseSectionData, SectionData } from './sectionData'
 
 /**
- * This file is poorly typed, mainly because nunjucks' parser API is also poorly typed
+ * This file is poorly typed, mainly because nunjucks' parser API is also poorly typed.
+ * Thus, it is not tested.
  */
 
-class SectionExtension {
+export class SectionExtension {
   sectionData: SectionData
   tags = ['section', 'chunk']
 
-  constructor(sectionData: SectionData) {
-    this.sectionData = sectionData
+  constructor(targetFile: TargetFile) {
+    this.sectionData = parseSectionData(targetFile)
   }
 
   // nunjucks' parser API is undocumented so we don't get type info here
@@ -45,8 +47,8 @@ class SectionExtension {
 
     const result =
       typeof endName === 'string'
-        ? getSectionRange(this.sectionData, startName, endName, defaultContent)
-        : getSection(this.sectionData, startName, defaultContent)
+        ? this.getSectionRange(startName, endName, defaultContent)
+        : this.getSection(startName, defaultContent)
 
     return new nunjucks.runtime.SafeString(result)
   }
@@ -58,47 +60,44 @@ class SectionExtension {
   ): nunjucks.runtime.SafeString {
     // endName is actually optionalDefaultContent when the section block was only passed a startName
     const defaultContent = optionalDefaultContent?.().trim() || ''
-    const result = getChunk(this.sectionData, chunkName, defaultContent)
+    const result = this.getChunk(chunkName, defaultContent)
     return new nunjucks.runtime.SafeString(result)
   }
-}
 
-function getChunk(sectionData: SectionData, chunkName: string, defaultContent: string) {
-  const section = sectionData.list.find((section) => section.name === chunkName)
+  /**
+   * Private methods
+   */
 
-  return section?.chunk.trim() || defaultContent
-}
+  private getChunk(chunkName: string, defaultContent: string) {
+    const section = this.sectionData.list.find((section) => section.name === chunkName)
 
-function getSection(sectionData: SectionData, startName: string, defaultContent: string) {
-  return sectionData.byName[startName] || defaultContent
-}
-
-function getSectionRange(
-  sectionData: SectionData,
-  startName: string,
-  endName: string,
-  defaultContent: string,
-) {
-  const sectionList = sectionData.list
-  const firstSectionIndex = sectionList.findIndex((section) => section.name === startName)
-  const lastSectionIndex =
-    endName === END_SECTION_ID
-      ? sectionList.length
-      : sectionList.findIndex((section) => section.name === endName)
-
-  if (firstSectionIndex < 0 || lastSectionIndex < 0) {
-    return defaultContent
+    return section?.chunk.trim() || defaultContent
   }
 
-  const firstSectionLevel = sectionList[firstSectionIndex].level
-  return sectionList
-    .slice(firstSectionIndex, lastSectionIndex)
-    .filter((section) => section.level === firstSectionLevel)
-    .map((section, index) =>
-      index === 0 ? section.contents : [section.header, section.contents].join(''),
-    )
-    .join('')
-    .trim()
-}
+  private getSection(startName: string, defaultContent: string) {
+    return this.sectionData.byName[startName] || defaultContent
+  }
 
-export { SectionExtension }
+  private getSectionRange(startName: string, endName: string, defaultContent: string) {
+    const sectionList = this.sectionData.list
+    const firstSectionIndex = sectionList.findIndex((section) => section.name === startName)
+    const lastSectionIndex =
+      endName === END_SECTION_ID
+        ? sectionList.length
+        : sectionList.findIndex((section) => section.name === endName)
+
+    if (firstSectionIndex < 0 || lastSectionIndex < 0) {
+      return defaultContent
+    }
+
+    const firstSectionLevel = sectionList[firstSectionIndex].level
+    return sectionList
+      .slice(firstSectionIndex, lastSectionIndex)
+      .filter((section) => section.level === firstSectionLevel)
+      .map((section, index) =>
+        index === 0 ? section.contents : [section.header, section.contents].join(''),
+      )
+      .join('')
+      .trim()
+  }
+}

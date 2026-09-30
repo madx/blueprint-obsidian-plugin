@@ -1,0 +1,96 @@
+{
+  "file": {
+    "path": "h1_section__update.md"
+  },
+  "source": "---\nblueprint: \"[[Blueprint.blueprint]]\"\n---\n# H1\nUpdated text",
+  "metadata": {
+    "headings": [
+      {
+        "position": {
+          "start": {
+            "line": 3,
+            "col": 0,
+            "offset": 45
+          },
+          "end": {
+            "line": 3,
+            "col": 4,
+            "offset": 49
+          }
+        },
+        "heading": "H1",
+        "level": 1
+      }
+    ],
+    "sections": [
+      {
+        "type": "yaml",
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 2,
+            "col": 3,
+            "offset": 44
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 3,
+            "col": 0,
+            "offset": 45
+          },
+          "end": {
+            "line": 3,
+            "col": 4,
+            "offset": 49
+          }
+        }
+      },
+      {
+        "type": "paragraph",
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 50
+          },
+          "end": {
+            "line": 4,
+            "col": 12,
+            "offset": 62
+          }
+        }
+      }
+    ],
+    "frontmatter": {
+      "blueprint": "[[Blueprint.blueprint]]"
+    },
+    "frontmatterPosition": {
+      "start": {
+        "line": 0,
+        "col": 0,
+        "offset": 0
+      },
+      "end": {
+        "line": 2,
+        "col": 3,
+        "offset": 44
+      }
+    },
+    "frontmatterLinks": [
+      {
+        "key": "blueprint",
+        "link": "Blueprint.blueprint",
+        "original": "[[Blueprint.blueprint]]",
+        "displayText": "Blueprint.blueprint"
+      }
+    ]
+  }
+}

@@ -1,5 +1,4 @@
-import { Template } from 'nunjucks'
-import type { App, TAbstractFile, TFile, TFolder } from 'obsidian'
+import { type App, type TAbstractFile, type TFile, type TFolder } from 'obsidian'
 
 class EnsureError extends Error {}
 
@@ -44,30 +43,18 @@ function isFolder(leaf: TAbstractFile): leaf is TFolder {
   return 'children' in leaf
 }
 
-function joinPath(folderPath: string, filePath: string) {
-  return folderPath.endsWith('/') ? folderPath + filePath : `${folderPath}/${filePath}`
+function isWikiLink(string: string) {
+  return string.startsWith('[[') && string.endsWith(']]') && string.length > 4
 }
 
-async function renderTemplate(template: Template, context: Record<string, unknown>) {
-  return new Promise<string>((resolve, reject) => {
-    template.render(context, (err: unknown, result: string | null) => {
-      if (err) {
-        return reject(err)
-      }
-
-      return resolve(result || '')
-    })
-  })
+function joinPath(folderPath: string, filePath: string) {
+  return folderPath.endsWith('/') ? folderPath + filePath : `${folderPath}/${filePath}`
 }
 
 function safeMerge(
   left: Record<string, unknown>,
   right: Record<string, unknown>,
 ): Record<string, unknown> {
-  if (left === null || right === null) {
-    return left ?? right
-  }
-
   const missingFromLeft = Object.fromEntries(
     Object.entries(right).filter(([key]) => !(key in left)),
   )
@@ -93,13 +80,18 @@ function safeMerge(
   return Object.assign({}, mergedLeft, missingFromLeft)
 }
 
+function unwikilink(wikilink: string) {
+  return isWikiLink(wikilink) ? wikilink.slice(2, -2).split('|').at(0)! : wikilink
+}
+
 export {
-  ensure,
   EnsureError,
+  ensure,
   fileHasBlueprint,
   fileIsBlueprint,
   findInTree,
+  isWikiLink,
   joinPath,
-  renderTemplate,
   safeMerge,
+  unwikilink,
 }

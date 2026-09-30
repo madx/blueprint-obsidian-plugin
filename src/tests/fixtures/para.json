@@ -1,0 +1,26 @@
+{
+  "file": {
+    "path": "para.md"
+  },
+  "source": "A paragraph.",
+  "metadata": {
+    "sections": [
+      {
+        "type": "paragraph",
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "col": 12,
+            "offset": 12
+          }
+        }
+      }
+    ],
+    "v": 1
+  }
+}

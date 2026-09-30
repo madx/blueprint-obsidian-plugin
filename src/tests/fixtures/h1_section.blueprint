@@ -1,0 +1,2 @@
+# H1
+{% section "H1" %}Default text{% endsection %}
